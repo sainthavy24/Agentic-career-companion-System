@@ -2,6 +2,7 @@ import { NavLink } from 'react-router-dom'
 
 const links = [
   { to: '/', label: 'Dashboard', end: true },
+  { to: '/profile', label: 'Profile & Skills' },
   { to: '/jobs', label: 'Job Scout' },
   { to: '/skill-gap', label: 'Skill Gap' },
   { to: '/learning', label: 'Learning' },

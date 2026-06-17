@@ -1,5 +1,6 @@
 """API v1 router. Per-agent routers get included here as phases land."""
 from fastapi import APIRouter
+from app.routers import jobs
 
 api_router = APIRouter()
 
@@ -24,3 +25,6 @@ def db_check():
         return {"connected": True, "rows": len(res.data), **diag}
     except Exception as e:
         return {"connected": False, "error": str(e), **diag}
+
+
+api_router.include_router(jobs.router, prefix="/jobs", tags=["job-scout"])

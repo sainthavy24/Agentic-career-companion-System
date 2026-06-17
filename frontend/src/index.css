@@ -44,3 +44,25 @@ a{text-decoration:none;color:inherit}
 .btn{background:var(--primary);color:#fff;border:0;border-radius:9px;padding:10px;font-size:14px;font-weight:600;cursor:pointer}
 .btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
 .msg{font-size:13px;color:var(--muted);margin-top:10px}
+
+/* Job Scout */
+.joblist{display:flex;flex-direction:column;gap:12px}
+.jobcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
+.jobhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
+.jobhead b{font-size:15px}
+.jobdesc{color:var(--muted);font-size:13px;margin:8px 0 0;line-height:1.5}
+.btn.small{padding:5px 10px;font-size:12px}
+
+/* Profile / skills */
+.skillform{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.skillform input[type=text],.skillform input:not([type]){flex:1;min-width:160px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px}
+.skillwrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.skillchip{display:inline-flex;align-items:center;gap:6px;background:var(--primary-soft);color:var(--primary);border:1px solid #c7d2fe;border-radius:999px;padding:5px 12px;font-size:13px;font-weight:600}
+.skillchip small{color:var(--muted);font-weight:500}
+.skillchip .x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0}
+.skillchip .x:hover{color:#dc2626}
+
+/* match chips */
+.chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 4px 2px 0}
+.chip.ok{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
+.chip.miss{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
