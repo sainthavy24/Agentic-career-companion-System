@@ -8,3 +8,6 @@ google-generativeai>=0.5
 groq>=0.9
 # ML libraries are added in Phase 3/4:
 # scikit-learn, joblib, transformers, torch, pandas, numpy
+scikit-learn>=1.3
+joblib>=1.3
+numpy>=1.26

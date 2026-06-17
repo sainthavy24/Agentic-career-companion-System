@@ -66,3 +66,9 @@ a{text-decoration:none;color:inherit}
 .chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 4px 2px 0}
 .chip.ok{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
 .chip.miss{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+
+/* ML pages */
+.ta{width:100%;min-height:160px;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;font-family:inherit;margin:10px 0;resize:vertical;box-sizing:border-box}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr}
+@media(max-width:760px){.g2{grid-template-columns:1fr}}

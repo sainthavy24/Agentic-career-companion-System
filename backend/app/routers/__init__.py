@@ -1,6 +1,6 @@
-"""API v1 router. Per-agent routers get included here as phases land."""
+"""API v1 router. Per-agent routers included here as phases land."""
 from fastapi import APIRouter
-from app.routers import jobs
+from app.routers import jobs, resume, skillgap
 
 api_router = APIRouter()
 
@@ -28,3 +28,5 @@ def db_check():
 
 
 api_router.include_router(jobs.router, prefix="/jobs", tags=["job-scout"])
+api_router.include_router(resume.router, prefix="/resume", tags=["resume"])
+api_router.include_router(skillgap.router, prefix="/skill-gap", tags=["skill-gap"])
