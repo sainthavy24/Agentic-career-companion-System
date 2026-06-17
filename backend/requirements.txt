@@ -1,0 +1,10 @@
+fastapi>=0.110
+uvicorn[standard]>=0.29
+python-dotenv>=1.0
+pydantic>=2.6
+httpx>=0.27
+supabase>=2.4
+google-generativeai>=0.5
+groq>=0.9
+# ML libraries are added in Phase 3/4:
+# scikit-learn, joblib, transformers, torch, pandas, numpy

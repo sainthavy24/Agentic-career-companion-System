@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PathCompanion AI — Planning Pack</title>
+<style>
+  :root{
+    --bg:#f4f6fb; --surface:#ffffff; --surface-2:#f8fafc; --border:#e4e8f0;
+    --text:#1e293b; --muted:#64748b; --faint:#94a3b8;
+    --primary:#4f46e5; --primary-soft:#eef2ff;
+    --job:#2563eb; --skill:#7c3aed; --learn:#0891b2; --resume:#059669; --interview:#db2777; --career:#ea580c;
+    --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px rgba(16,24,40,.06);
+    --radius:14px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:'Segoe UI',-apple-system,BlinkMacSystemFont,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);line-height:1.55;-webkit-font-smoothing:antialiased}
+  a{color:var(--primary);text-decoration:none}
+  .layout{display:flex;min-height:100vh}
+  /* sidebar */
+  .sidebar{position:sticky;top:0;align-self:flex-start;width:248px;height:100vh;overflow:auto;background:var(--surface);border-right:1px solid var(--border);padding:22px 16px;flex-shrink:0}
+  .brand{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .brand .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:flex;align-items:center;justify-content:center;color:#fff;font-weight:800;font-size:15px}
+  .brand b{font-size:15px}
+  .brand small{display:block;color:var(--muted);font-size:11px;font-weight:500}
+  .nav{margin-top:18px;display:flex;flex-direction:column;gap:2px}
+  .nav a{padding:9px 12px;border-radius:9px;color:var(--muted);font-size:13.5px;font-weight:500;display:flex;align-items:center;gap:9px}
+  .nav a:hover{background:var(--surface-2);color:var(--text)}
+  .nav a.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
+  .nav .dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.55}
+  /* main */
+  main{flex:1;max-width:1080px;margin:0 auto;padding:38px 40px 90px}
+  .hero{margin-bottom:10px}
+  .hero h1{font-size:30px;margin:0 0 6px;letter-spacing:-.5px}
+  .hero p{color:var(--muted);margin:0;font-size:15px}
+  .tagrow{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+  .tag{background:var(--surface);border:1px solid var(--border);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--muted);font-weight:500}
+  .tag b{color:var(--text)}
+  section{margin-top:46px;scroll-margin-top:20px}
+  .sec-head{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+  .sec-head h2{font-size:21px;margin:0;letter-spacing:-.3px}
+  .sec-num{font-size:12px;font-weight:700;color:var(--primary);background:var(--primary-soft);padding:3px 8px;border-radius:6px}
+  .sec-sub{color:var(--muted);font-size:14px;margin:0 0 20px}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .pad{padding:20px 22px}
+  .grid{display:grid;gap:14px}
+  .g2{grid-template-columns:repeat(2,1fr)} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+  @media(max-width:880px){.g2,.g3,.g4{grid-template-columns:1fr}}
+  /* architecture */
+  .arch{display:flex;flex-direction:column;gap:14px}
+  .tier{border:1px solid var(--border);border-radius:12px;padding:14px 16px;background:var(--surface)}
+  .tier-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:8px}
+  .tier-label .pill{background:var(--primary-soft);color:var(--primary);padding:2px 8px;border-radius:6px}
+  .row{display:flex;flex-wrap:wrap;gap:10px}
+  .node{flex:1;min-width:120px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:11px 13px;font-size:13px;font-weight:600}
+  .node small{display:block;font-weight:500;color:var(--muted);font-size:11.5px;margin-top:3px}
+  .node.ml{background:#fff7ed;border-color:#fed7aa}
+  .node.ml b{color:var(--career)}
+  .node.ext{background:#f5f3ff;border-color:#ddd6fe}
+  .flowdown{text-align:center;color:var(--faint);font-size:18px;line-height:1}
+  .legend{display:flex;gap:16px;flex-wrap:wrap;margin-top:12px;font-size:12px;color:var(--muted)}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .sw{width:12px;height:12px;border-radius:3px;border:1px solid var(--border)}
+  /* agents */
+  .agent{border-left:3px solid var(--c);padding:2px 0 2px 14px;margin-bottom:14px}
+  .agent h4{margin:0 0 2px;font-size:14.5px}
+  .agent p{margin:0;color:var(--muted);font-size:13px}
+  .badge{display:inline-block;font-size:10.5px;font-weight:700;color:#fff;background:var(--c);padding:2px 7px;border-radius:5px;vertical-align:middle;margin-left:6px}
+  /* data model */
+  .tbl{font-size:12.5px}
+  .tbl .t{font-weight:700;font-size:13px;margin-bottom:3px;display:flex;align-items:center;gap:6px}
+  .tbl .v{font-size:10px;background:#ecfeff;color:#0e7490;border:1px solid #a5f3fc;padding:1px 5px;border-radius:4px;font-weight:700}
+  .tbl small{color:var(--muted)}
+  /* screen map */
+  .screens{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+  @media(max-width:880px){.screens{grid-template-columns:1fr}}
+  .smcard{border:1px solid var(--border);border-radius:12px;overflow:hidden;background:var(--surface)}
+  .smhead{padding:10px 14px;font-weight:700;font-size:13.5px;color:#fff;display:flex;align-items:center;gap:8px}
+  .smlist{padding:8px 14px 12px}
+  .smlist div{padding:6px 0;border-bottom:1px dashed var(--border);font-size:13px}
+  .smlist div:last-child{border:0}
+  .smlist b{font-weight:600}
+  .smlist small{color:var(--muted);display:block;font-size:11.5px}
+  /* wireframe tabs */
+  .tabs{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:16px}
+  .tabs button{border:1px solid var(--border);background:var(--surface);color:var(--muted);padding:7px 13px;border-radius:999px;font-size:12.5px;font-weight:600;cursor:pointer;font-family:inherit}
+  .tabs button:hover{color:var(--text)}
+  .tabs button.on{background:var(--primary);color:#fff;border-color:var(--primary)}
+  .wf{display:none}
+  .wf.on{display:block;animation:fade .25s ease}
+  @keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+  .browser{border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);background:var(--surface)}
+  .bbar{background:var(--surface-2);border-bottom:1px solid var(--border);padding:9px 12px;display:flex;align-items:center;gap:8px}
+  .bbar .d{width:10px;height:10px;border-radius:50%}
+  .bbar .u{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;font-size:11.5px;color:var(--muted);padding:4px 10px;margin-left:6px}
+  .screen{padding:0;background:var(--bg)}
+  .wfcap{font-size:12.5px;color:var(--muted);margin:10px 2px 0}
+  /* app chrome inside wireframes */
+  .app{display:flex;min-height:430px;font-size:12.5px}
+  .app-side{width:150px;background:var(--surface);border-right:1px solid var(--border);padding:14px 10px;flex-shrink:0}
+  .app-logo{font-weight:800;font-size:13px;margin-bottom:14px;display:flex;align-items:center;gap:7px}
+  .app-logo i{width:22px;height:22px;border-radius:6px;background:linear-gradient(135deg,#4f46e5,#7c3aed);display:inline-block}
+  .app-side a{display:flex;align-items:center;gap:8px;padding:7px 9px;border-radius:8px;color:var(--muted);font-size:12px;font-weight:500;margin-bottom:2px}
+  .app-side a.cur{background:var(--primary-soft);color:var(--primary);font-weight:600}
+  .app-side a .ic{width:8px;height:8px;border-radius:2px;background:currentColor;opacity:.6}
+  .app-main{flex:1;padding:16px 18px;overflow:hidden}
+  .app-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+  .app-top h3{margin:0;font-size:16px}
+  .app-top .av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,#94a3b8,#cbd5e1)}
+  .btn{background:var(--primary);color:#fff;border:0;border-radius:8px;padding:7px 13px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+  .btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+  .chip{display:inline-block;font-size:10.5px;font-weight:600;padding:2px 8px;border-radius:999px;margin:2px 3px 2px 0}
+  .chip.ok{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
+  .chip.miss{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+  .chip.neu{background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
+  .mini{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:10px}
+  .bar{height:7px;border-radius:99px;background:var(--surface-2);overflow:hidden}
+  .bar i{display:block;height:100%;background:var(--primary)}
+  .kpi{display:flex;gap:10px;margin-bottom:14px}
+  .kpi .k{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px 12px}
+  .kpi .k b{font-size:18px;display:block}
+  .kpi .k small{color:var(--muted);font-size:11px}
+  .muted{color:var(--muted)}
+  .ladder{display:flex;gap:8px;align-items:stretch}
+  .step{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:10px;text-align:center;font-size:11.5px}
+  .step.cur{border-color:var(--career);box-shadow:0 0 0 2px #ffedd5}
+  .step b{display:block;font-size:12.5px;margin-bottom:3px}
+  .voice{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#db2777,#f472b6);margin:6px auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px}
+  .ring{box-shadow:0 0 0 6px #fce7f3}
+  /* build order */
+  .phase{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:1px dashed var(--border)}
+  .phase:last-child{border:0}
+  .pno{width:30px;height:30px;border-radius:8px;background:var(--primary-soft);color:var(--primary);font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:13px}
+  .phase b{font-size:13.5px}
+  .phase p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+  .note{background:var(--primary-soft);border:1px solid #c7d2fe;border-radius:10px;padding:12px 14px;font-size:13px;color:#3730a3;margin-top:14px}
+  footer{margin-top:40px;color:var(--faint);font-size:12px;text-align:center}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="logo">P</div>
+      <div><b>PathCompanion AI</b><small>Planning Pack v1</small></div>
+    </div>
+    <nav class="nav" id="nav">
+      <a href="#overview" class="active"><span class="dot"></span>Overview</a>
+      <a href="#architecture"><span class="dot"></span>Architecture</a>
+      <a href="#agents"><span class="dot"></span>The 6 Agents</a>
+      <a href="#data"><span class="dot"></span>Data Model</a>
+      <a href="#screens"><span class="dot"></span>Screen Map</a>
+      <a href="#wireframes"><span class="dot"></span>Wireframes</a>
+      <a href="#build"><span class="dot"></span>Build Order</a>
+    </nav>
+  </aside>
+
+  <main>
+    <div class="hero" id="overview">
+      <h1>PathCompanion AI — Planning Pack</h1>
+      <p>An agentic career &amp; talent companion · 6 cooperating agents · 2 custom-trained ML models · hybrid intelligence</p>
+      <div class="tagrow">
+        <span class="tag"><b>Frontend:</b> React 18 + Vite</span>
+        <span class="tag"><b>Backend:</b> FastAPI + LangGraph</span>
+        <span class="tag"><b>DB:</b> Supabase (PostgreSQL + pgvector)</span>
+        <span class="tag"><b>ML:</b> scikit-learn · DistilBERT</span>
+        <span class="tag"><b>LLMs:</b> Gemini · Groq Llama · Whisper · Edge-TTS</span>
+        <span class="tag"><b>Design:</b> Clean light / professional</span>
+      </div>
+    </div>
+
+    <div class="grid g3" style="margin-top:24px">
+      <div class="card pad"><b style="font-size:22px;color:var(--primary)">6</b><div class="muted" style="font-size:13px">cooperating agents, usable standalone or interconnected</div></div>
+      <div class="card pad"><b style="font-size:22px;color:var(--career)">2</b><div class="muted" style="font-size:13px">in-house trained models (resume classifier + skill extractor)</div></div>
+      <div class="card pad"><b style="font-size:22px;color:var(--resume)">~28</b><div class="muted" style="font-size:13px">screens across auth, dashboard &amp; the 6 modules</div></div>
+    </div>
+
+    <!-- ARCHITECTURE -->
+    <section id="architecture">
+      <div class="sec-head"><span class="sec-num">01</span><h2>System Architecture</h2></div>
+      <p class="sec-sub">Three tiers plus a model-inference layer. Agents never call each other directly — they read/write shared memory and emit events (this powers the interconnected cascade).</p>
+      <div class="card pad">
+        <div class="arch">
+          <div class="tier">
+            <div class="tier-label"><span class="pill">Client</span> Frontend — React 18 + Vite (REST + Server-Sent Events)</div>
+            <div class="row">
+              <div class="node">Dashboard<small>overview + cascade alerts</small></div>
+              <div class="node">Agent workspaces<small>one per module</small></div>
+              <div class="node">Persistent chat<small>streamed responses</small></div>
+              <div class="node">Auth screens<small>Supabase auth</small></div>
+            </div>
+          </div>
+          <div class="flowdown">▼</div>
+          <div class="tier">
+            <div class="tier-label"><span class="pill">Server</span> Backend — FastAPI (async) + LangGraph orchestrator</div>
+            <div class="row">
+              <div class="node">Versioned API routes<small>one set per agent</small></div>
+              <div class="node">LangGraph cascade<small>idempotent state graph</small></div>
+              <div class="node">Background workers<small>job sync, reports</small></div>
+            </div>
+            <div class="row" style="margin-top:10px">
+              <div class="node ml"><b>Model-Inference module</b><small>loads the 2 trained models</small></div>
+              <div class="node ml">Resume Classifier<small>DistilBERT / joblib</small></div>
+              <div class="node ml">Skill Extractor<small>multi-label DistilBERT</small></div>
+            </div>
+          </div>
+          <div class="flowdown">▼</div>
+          <div class="tier">
+            <div class="tier-label"><span class="pill">Data</span> Supabase — PostgreSQL + pgvector</div>
+            <div class="row">
+              <div class="node">12 relational tables<small>profiles, jobs, gaps…</small></div>
+              <div class="node">agent_events bus<small>drives the cascade</small></div>
+              <div class="node">pgvector (768-d)<small>HNSW semantic search</small></div>
+              <div class="node">Auth + Row-Level Security<small>per-user isolation</small></div>
+            </div>
+          </div>
+          <div class="flowdown">▼</div>
+          <div class="tier">
+            <div class="tier-label"><span class="pill">External</span> Free-tier services</div>
+            <div class="row">
+              <div class="node ext">Gemini Flash<small>analysis + JSON</small></div>
+              <div class="node ext">Groq Llama 3.3<small>chat / low-latency</small></div>
+              <div class="node ext">Groq Whisper<small>speech-to-text</small></div>
+              <div class="node ext">Edge-TTS<small>voice output</small></div>
+              <div class="node ext">Job APIs<small>Remotive · Adzuna · Jooble…</small></div>
+            </div>
+          </div>
+          <div class="legend">
+            <span><span class="sw" style="background:var(--surface-2)"></span>Core component</span>
+            <span><span class="sw" style="background:#fff7ed;border-color:#fed7aa"></span>Trained ML model</span>
+            <span><span class="sw" style="background:#f5f3ff;border-color:#ddd6fe"></span>External free-tier API</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="card pad" style="margin-top:16px">
+        <div class="tier-label"><span class="pill" style="background:#fef3c7;color:#b45309">Cascade</span> Interconnected flow — triggered by a single user action</div>
+        <div class="row" style="align-items:center">
+          <div class="node">① User marks a skill “learned”<small>Learning agent</small></div>
+          <div class="flowdown" style="flex:0 0 24px">▶</div>
+          <div class="node">② Skills DB updated<small>via skill-extractor</small></div>
+          <div class="flowdown" style="flex:0 0 24px">▶</div>
+          <div class="node">③ Gap analyses refreshed<small>Skill Gap agent</small></div>
+          <div class="flowdown" style="flex:0 0 24px">▶</div>
+          <div class="node">④ Resume drafts flagged<small>Resume Architect</small></div>
+        </div>
+        <p class="muted" style="margin:12px 0 0;font-size:12.5px">Target: complete within 30s, non-blocking (background workers + agent_events).</p>
+      </div>
+    </section>
+
+    <!-- AGENTS -->
+    <section id="agents">
+      <div class="sec-head"><span class="sec-num">02</span><h2>The 6 Agents</h2></div>
+      <p class="sec-sub">Each is usable on its own (standalone) or reacting to others (interconnected). Two are powered by the trained models.</p>
+      <div class="card pad">
+        <div class="agent" style="--c:var(--job)"><h4>Job Scout <span class="badge">semantic match</span></h4><p>Aggregates jobs daily from free APIs, stores 768-d embeddings, ranks with hybrid score (embedding similarity + skill overlap). Shows matched / missing skills per job.</p></div>
+        <div class="agent" style="--c:var(--skill)"><h4>Skill Gap Analyzer <span class="badge">Model 2</span></h4><p>Compares your skills vs a job/goal and produces a present-vs-missing report with importance weights. Skill detection uses the <b>trained skill-extraction model</b>.</p></div>
+        <div class="agent" style="--c:var(--learn)"><h4>Learning Resource Finder <span class="badge">cascade trigger</span></h4><p>Turns each gap into an ordered study path of free resources. Marking a skill “learned” emits the event that drives the cascade.</p></div>
+        <div class="agent" style="--c:var(--resume)"><h4>Resume Architect <span class="badge">Model 1</span></h4><p>Upload &amp; parse or build in-app. The <b>trained resume classifier</b> auto-categorises resumes; generates ATS-tailored versions per job, export PDF.</p></div>
+        <div class="agent" style="--c:var(--interview)"><h4>Mock Interview &amp; Panic Control <span class="badge">voice</span></h4><p>Spoken interviews (Edge-TTS + Whisper), job-specific questions, panic button with breathing exercises, anxiety tracked pre/post, full feedback report.</p></div>
+        <div class="agent" style="--c:var(--career)"><h4>Career Path Planner <span class="badge">roadmap</span></h4><p>Maps the next roles (Intern→Lead) with per-stage skills, durations and contextual tips.</p></div>
+      </div>
+    </section>
+
+    <!-- DATA MODEL -->
+    <section id="data">
+      <div class="sec-head"><span class="sec-num">03</span><h2>Data Model</h2></div>
+      <p class="sec-sub">12 relational tables + an <code>agent_events</code> bus. <span class="tbl"><span class="v">vector</span></span> = 768-d pgvector column for semantic search. All tables under row-level security.</p>
+      <div class="grid g3">
+        <div class="card pad tbl"><div class="t">profiles</div><small>user master profile, target role, prefs</small></div>
+        <div class="card pad tbl"><div class="t">skills</div><small>per-user skills + proficiency (shared memory)</small></div>
+        <div class="card pad tbl"><div class="t">job_postings <span class="v">vector</span></div><small>aggregated jobs + embeddings</small></div>
+        <div class="card pad tbl"><div class="t">matches</div><small>job↔user hybrid scores, matched/missing</small></div>
+        <div class="card pad tbl"><div class="t">gap_analyses</div><small>present/missing skills + importance</small></div>
+        <div class="card pad tbl"><div class="t">learning_plans</div><small>ordered resources, progress</small></div>
+        <div class="card pad tbl"><div class="t">resumes <span class="v">vector</span></div><small>master + tailored versions, category</small></div>
+        <div class="card pad tbl"><div class="t">interview_sessions</div><small>session meta, anxiety pre/post</small></div>
+        <div class="card pad tbl"><div class="t">interview_turns</div><small>Q/A turns, per-answer feedback</small></div>
+        <div class="card pad tbl"><div class="t">career_paths</div><small>ladder stages for a goal</small></div>
+        <div class="card pad tbl"><div class="t">milestones</div><small>per-stage skills, durations</small></div>
+        <div class="card pad tbl"><div class="t">agent_events</div><small>shared event bus → cascade</small></div>
+      </div>
+    </section>
+
+    <!-- SCREEN MAP -->
+    <section id="screens">
+      <div class="sec-head"><span class="sec-num">04</span><h2>Screen Map</h2></div>
+      <p class="sec-sub">All screens grouped by area. Shared shell (sidebar + persistent chat) wraps every module.</p>
+      <div class="screens">
+        <div class="smcard"><div class="smhead" style="background:#475569">Shared &amp; Core</div><div class="smlist">
+          <div><b>Landing / Sign in · Sign up</b><small>Supabase auth (email + OAuth)</small></div>
+          <div><b>Onboarding wizard</b><small>profile, target role, upload resume, starting skills</small></div>
+          <div><b>Dashboard</b><small>overview cards, recent activity, cascade alerts, quick actions</small></div>
+          <div><b>Master Profile</b><small>skills, experience, education (shared memory)</small></div>
+          <div><b>Settings</b><small>account, data &amp; privacy (RLS), integrations</small></div>
+          <div><b>Persistent chat panel</b><small>assistant available on every screen</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:var(--job)">Job Scout</div><div class="smlist">
+          <div><b>Job feed</b><small>filters + cards with match %, matched/missing skills</small></div>
+          <div><b>Job detail</b><small>full JD, match breakdown, “Learn skills”, “Tailor resume”</small></div>
+          <div><b>Saved / tracked jobs</b><small>shortlist &amp; application status</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:var(--skill)">Skill Gap Analyzer</div><div class="smlist">
+          <div><b>Gap analysis</b><small>pick job/goal → present vs missing + importance</small></div>
+          <div><b>Skill detail</b><small>why it matters, jump to learning</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:var(--learn)">Learning Resource Finder</div><div class="smlist">
+          <div><b>Learning path</b><small>ordered steps per missing skill, progress</small></div>
+          <div><b>Resource view</b><small>open resource, mark complete (fires cascade)</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:var(--resume)">Resume Architect</div><div class="smlist">
+          <div><b>Upload &amp; parse</b><small>PDF → structured + auto category (Model 1)</small></div>
+          <div><b>Resume builder</b><small>build from master profile</small></div>
+          <div><b>Tailored resume</b><small>ATS-optimised per job, PDF export</small></div>
+          <div><b>Versions</b><small>list of resumes per target job</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:var(--interview)">Mock Interview &amp; Panic Control</div><div class="smlist">
+          <div><b>Interview setup</b><small>pick job + interview type</small></div>
+          <div><b>Live interview</b><small>voice Q/A, transcript, panic button</small></div>
+          <div><b>Feedback report</b><small>per-answer scores, anxiety pre/post</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:var(--career)">Career Path Planner</div><div class="smlist">
+          <div><b>Career ladder</b><small>Intern→Lead stages, skills, durations</small></div>
+          <div><b>Stage detail</b><small>required skills + contextual tips</small></div>
+        </div></div>
+        <div class="smcard"><div class="smhead" style="background:#0f766e">Future (deferred)</div><div class="smlist">
+          <div><b>Daily Journal &amp; Discussion</b><small>moved to future scope</small></div>
+          <div><b>Career Progress Summarizer</b><small>moved to future scope</small></div>
+        </div></div>
+      </div>
+    </section>
+
+    <!-- WIREFRAMES -->
+    <section id="wireframes">
+      <div class="sec-head"><span class="sec-num">05</span><h2>Wireframes</h2></div>
+      <p class="sec-sub">Low-fidelity, clean-light mockups of the key screens. Click a tab to switch. (Layout &amp; intent, not final pixels.)</p>
+      <div class="tabs" id="tabs">
+        <button class="on" data-w="dash">Dashboard</button>
+        <button data-w="onb">Onboarding</button>
+        <button data-w="job">Job Scout</button>
+        <button data-w="gap">Skill Gap</button>
+        <button data-w="learn">Learning Path</button>
+        <button data-w="res">Resume Architect</button>
+        <button data-w="intv">Mock Interview</button>
+        <button data-w="career">Career Path</button>
+      </div>
+
+      <!-- Dashboard -->
+      <div class="wf on" id="wf-dash">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/dashboard</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a class="cur"><span class="ic"></span>Dashboard</a><a><span class="ic"></span>Job Scout</a><a><span class="ic"></span>Skill Gap</a><a><span class="ic"></span>Learning</a><a><span class="ic"></span>Resume</a><a><span class="ic"></span>Interview</a><a><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main">
+            <div class="app-top"><h3>Welcome back, Penq 👋</h3><div class="av"></div></div>
+            <div class="kpi"><div class="k"><b>18</b><small>new job matches</small></div><div class="k"><b>5</b><small>skill gaps</small></div><div class="k"><b>72%</b><small>profile strength</small></div></div>
+            <div class="grid g2">
+              <div class="mini"><b style="font-size:13px">Top match · Frontend Engineer</b><div style="margin:6px 0"><span class="chip ok">React</span><span class="chip ok">JS</span><span class="chip miss">TypeScript</span><span class="chip miss">Testing</span></div><div class="bar"><i style="width:78%"></i></div><small class="muted">78% match</small></div>
+              <div class="mini"><b style="font-size:13px">Cascade alert</b><p class="muted" style="margin:6px 0 0;font-size:12px">You learned <b>Docker</b> → 2 gap analyses refreshed, 1 resume flagged for update.</p><button class="btn" style="margin-top:8px">Review</button></div>
+            </div>
+            <div class="mini"><b style="font-size:13px">Continue</b><div style="display:flex;gap:8px;margin-top:8px"><button class="btn ghost">Resume a mock interview</button><button class="btn ghost">Finish learning path</button></div></div>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Hub screen — KPIs, top matches, the cascade alert, and quick actions into each agent.</p>
+      </div>
+
+      <!-- Onboarding -->
+      <div class="wf" id="wf-onb">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/onboarding</span></div>
+        <div class="screen"><div style="padding:26px;max-width:520px;margin:0 auto">
+          <div class="muted" style="font-size:11px">Step 2 of 4</div>
+          <div class="bar" style="margin:6px 0 18px"><i style="width:50%"></i></div>
+          <h3 style="margin:0 0 4px">What role are you aiming for?</h3>
+          <p class="muted" style="margin:0 0 16px;font-size:13px">We tailor jobs, gaps and interviews to this target.</p>
+          <div class="mini">🎯 Target role <div style="margin-top:6px"><span class="chip neu">Frontend Engineer ✓</span><span class="chip neu">Data Analyst</span><span class="chip neu">+ add</span></div></div>
+          <div class="mini">🧩 Your current skills <div style="margin-top:6px"><span class="chip ok">React</span><span class="chip ok">JavaScript</span><span class="chip ok">CSS</span><span class="chip neu">+ add</span></div></div>
+          <div class="mini">📄 Upload resume (optional) <p class="muted" style="margin:6px 0 0;font-size:12px">PDF → parsed &amp; auto-categorised by Model 1</p></div>
+          <div style="display:flex;justify-content:space-between;margin-top:16px"><button class="btn ghost">Back</button><button class="btn">Continue</button></div>
+        </div></div></div>
+        <p class="wfcap">Onboarding wizard — seeds the shared profile that every agent reads.</p>
+      </div>
+
+      <!-- Job Scout -->
+      <div class="wf" id="wf-job">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/jobs</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a><span class="ic"></span>Dashboard</a><a class="cur"><span class="ic"></span>Job Scout</a><a><span class="ic"></span>Skill Gap</a><a><span class="ic"></span>Learning</a><a><span class="ic"></span>Resume</a><a><span class="ic"></span>Interview</a><a><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main">
+            <div class="app-top"><h3>Job Scout</h3><button class="btn ghost">Filters ▾</button></div>
+            <div style="margin-bottom:10px"><span class="chip neu">Remote</span><span class="chip neu">Worldwide</span><span class="chip neu">Match ≥ 70%</span></div>
+            <div class="mini"><div style="display:flex;justify-content:space-between"><b style="font-size:13px">Frontend Engineer · Remotive</b><span class="chip ok">82%</span></div><div style="margin:6px 0"><span class="chip ok">React</span><span class="chip ok">JavaScript</span><span class="chip miss">TypeScript</span><span class="chip miss">Jest</span></div><div style="display:flex;gap:6px"><button class="btn">Tailor resume</button><button class="btn ghost">Learn skills</button></div></div>
+            <div class="mini"><div style="display:flex;justify-content:space-between"><b style="font-size:13px">React Developer · Arbeitnow</b><span class="chip ok">76%</span></div><div style="margin:6px 0"><span class="chip ok">React</span><span class="chip ok">Redux</span><span class="chip miss">Next.js</span></div><div style="display:flex;gap:6px"><button class="btn">Tailor resume</button><button class="btn ghost">Learn skills</button></div></div>
+            <div class="mini" style="opacity:.6"><div style="display:flex;justify-content:space-between"><b style="font-size:13px">UI Engineer · Adzuna</b><span class="chip neu">61%</span></div></div>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Semantic job feed — each card shows hybrid match %, matched (green) and missing (red) skills, with one-click actions.</p>
+      </div>
+
+      <!-- Skill Gap -->
+      <div class="wf" id="wf-gap">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/skill-gap</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a><span class="ic"></span>Dashboard</a><a><span class="ic"></span>Job Scout</a><a class="cur"><span class="ic"></span>Skill Gap</a><a><span class="ic"></span>Learning</a><a><span class="ic"></span>Resume</a><a><span class="ic"></span>Interview</a><a><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main">
+            <div class="app-top"><h3>Skill Gap · Frontend Engineer</h3><span class="chip neu">via Model 2</span></div>
+            <div class="grid g2">
+              <div class="mini"><b style="font-size:13px;color:var(--resume)">✓ You have</b><div style="margin-top:8px"><span class="chip ok">React</span><span class="chip ok">JavaScript</span><span class="chip ok">HTML/CSS</span><span class="chip ok">Git</span></div></div>
+              <div class="mini"><b style="font-size:13px;color:#dc2626">✗ Missing</b>
+                <div style="margin-top:8px;font-size:12px">TypeScript <div class="bar" style="margin:3px 0 8px"><i style="width:90%;background:#dc2626"></i></div>Testing (Jest) <div class="bar" style="margin:3px 0 8px"><i style="width:70%;background:#f59e0b"></i></div>Next.js <div class="bar" style="margin:3px 0"><i style="width:45%;background:#f59e0b"></i></div></div>
+                <small class="muted">bar = importance for this role</small>
+              </div>
+            </div>
+            <button class="btn" style="margin-top:6px">Build learning path →</button>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Gap report — skills extracted by the trained model, split into have / missing with importance weighting.</p>
+      </div>
+
+      <!-- Learning Path -->
+      <div class="wf" id="wf-learn">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/learning</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a><span class="ic"></span>Dashboard</a><a><span class="ic"></span>Job Scout</a><a><span class="ic"></span>Skill Gap</a><a class="cur"><span class="ic"></span>Learning</a><a><span class="ic"></span>Resume</a><a><span class="ic"></span>Interview</a><a><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main">
+            <div class="app-top"><h3>Learning Path · TypeScript</h3><span class="chip neu">3 of 5 done</span></div>
+            <div class="bar" style="margin-bottom:12px"><i style="width:60%;background:var(--learn)"></i></div>
+            <div class="mini" style="display:flex;justify-content:space-between"><span>① TS Handbook — Basics <small class="muted">· docs</small></span><span class="chip ok">done</span></div>
+            <div class="mini" style="display:flex;justify-content:space-between"><span>② freeCodeCamp — TS course <small class="muted">· video</small></span><span class="chip ok">done</span></div>
+            <div class="mini" style="display:flex;justify-content:space-between;border-color:var(--learn)"><span>③ Types &amp; Generics <small class="muted">· article</small></span><button class="btn" style="background:var(--learn)">Mark complete</button></div>
+            <div class="mini" style="opacity:.6;display:flex;justify-content:space-between"><span>④ Project: convert JS app</span><span class="chip neu">todo</span></div>
+            <div class="note" style="margin-top:6px">Marking complete fires the <b>cascade</b> → skills DB, gap analysis &amp; resume update automatically.</div>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Ordered, free resources per missing skill — completing a step triggers the interconnected cascade.</p>
+      </div>
+
+      <!-- Resume Architect -->
+      <div class="wf" id="wf-res">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/resume</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a><span class="ic"></span>Dashboard</a><a><span class="ic"></span>Job Scout</a><a><span class="ic"></span>Skill Gap</a><a><span class="ic"></span>Learning</a><a class="cur"><span class="ic"></span>Resume</a><a><span class="ic"></span>Interview</a><a><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main">
+            <div class="app-top"><h3>Resume Architect</h3><span class="chip ok">Category: Information-Technology (Model 1)</span></div>
+            <div class="grid g2">
+              <div class="mini"><b style="font-size:13px">Tailoring for</b><p class="muted" style="margin:4px 0 8px;font-size:12px">Frontend Engineer · Remotive</p><span class="chip neu">ATS score 88</span><span class="chip ok">+ React</span><span class="chip ok">+ TS</span></div>
+              <div class="mini" style="background:var(--surface-2)"><div class="muted" style="font-size:11px">preview</div><div style="background:#fff;border:1px solid var(--border);border-radius:6px;padding:10px;margin-top:6px"><div style="font-weight:700;font-size:12px">Penq — Frontend Engineer</div><div style="height:5px;background:var(--surface-2);border-radius:9px;margin:6px 0"></div><div style="height:5px;background:var(--surface-2);border-radius:9px;width:80%;margin-bottom:6px"></div><div style="height:5px;background:var(--surface-2);border-radius:9px;width:60%"></div></div></div>
+            </div>
+            <div style="display:flex;gap:8px;margin-top:6px"><button class="btn">Export PDF</button><button class="btn ghost">Upload &amp; parse PDF</button><button class="btn ghost">New version</button></div>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Upload &amp; parse or build in-app; the classifier badges the category and the app tailors an ATS version per job.</p>
+      </div>
+
+      <!-- Mock Interview -->
+      <div class="wf" id="wf-intv">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/interview</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a><span class="ic"></span>Dashboard</a><a><span class="ic"></span>Job Scout</a><a><span class="ic"></span>Skill Gap</a><a><span class="ic"></span>Learning</a><a><span class="ic"></span>Resume</a><a class="cur"><span class="ic"></span>Interview</a><a><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main" style="text-align:center">
+            <div class="app-top" style="justify-content:center"><h3>Mock Interview · Frontend Engineer</h3></div>
+            <div class="voice ring">🎙️</div>
+            <p class="muted" style="font-size:12px;margin:2px 0 12px">Interviewer is speaking…</p>
+            <div class="mini" style="text-align:left"><b style="font-size:12.5px">Q3.</b> Can you explain the difference between props and state in React?</div>
+            <div class="mini" style="text-align:left;background:var(--surface-2)"><small class="muted">your answer (live transcript)</small><p style="margin:4px 0 0;font-size:12px">“Props are passed from parent, state is managed within…”</p></div>
+            <div style="display:flex;gap:8px;justify-content:center;margin-top:8px"><button class="btn" style="background:var(--interview)">Answer</button><button class="btn ghost" style="border-color:#fca5a5;color:#dc2626">🫁 Panic</button><button class="btn ghost">End</button></div>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Voice interview — neural TTS asks, Whisper transcribes you, panic button gives breathing exercises; report follows.</p>
+      </div>
+
+      <!-- Career Path -->
+      <div class="wf" id="wf-career">
+        <div class="browser"><div class="bbar"><span class="d" style="background:#f87171"></span><span class="d" style="background:#fbbf24"></span><span class="d" style="background:#34d399"></span><span class="u">pathcompanion.ai/career-path</span></div>
+        <div class="screen"><div class="app">
+          <div class="app-side"><div class="app-logo"><i></i>PathCompanion</div>
+            <a><span class="ic"></span>Dashboard</a><a><span class="ic"></span>Job Scout</a><a><span class="ic"></span>Skill Gap</a><a><span class="ic"></span>Learning</a><a><span class="ic"></span>Resume</a><a><span class="ic"></span>Interview</a><a class="cur"><span class="ic"></span>Career Path</a>
+          </div>
+          <div class="app-main">
+            <div class="app-top"><h3>Career Path · Software Engineering</h3></div>
+            <div class="ladder">
+              <div class="step"><b>Intern</b><span class="muted">done</span></div>
+              <div class="step cur"><b>Junior ●</b><span class="muted">you · ~10mo</span></div>
+              <div class="step"><b>Mid</b><span class="muted">~18mo</span></div>
+              <div class="step"><b>Senior</b><span class="muted">~24mo</span></div>
+              <div class="step"><b>Lead</b><span class="muted">~30mo</span></div>
+            </div>
+            <div class="mini" style="margin-top:14px"><b style="font-size:13px">Next: Mid-level — skills to build</b><div style="margin-top:8px"><span class="chip miss">System design</span><span class="chip miss">Testing depth</span><span class="chip miss">Mentoring</span><span class="chip ok">React (have)</span></div></div>
+            <p class="muted" style="font-size:12px">💡 Tip: pick one system-design topic per sprint; pair it with a learning path.</p>
+          </div>
+        </div></div></div>
+        <p class="wfcap">Progression ladder — current stage highlighted, next-stage skills + realistic timeline and tips.</p>
+      </div>
+    </section>
+
+    <!-- BUILD ORDER -->
+    <section id="build">
+      <div class="sec-head"><span class="sec-num">06</span><h2>Build Order (16 weeks)</h2></div>
+      <p class="sec-sub">Matches the proposal timeline. Two phases are dedicated to the trained ML models.</p>
+      <div class="card pad">
+        <div class="phase"><div class="pno">1</div><div><b>Foundations · W1–2</b><p>Repo, Supabase schema (12 tables) + pgvector, auth + row-level security, app shell (sidebar + chat).</p></div></div>
+        <div class="phase"><div class="pno">2</div><div><b>Job Scout · W3–4</b><p>Job aggregation from free APIs, 768-d embeddings, hybrid matching, job feed + detail screens.</p></div></div>
+        <div class="phase"><div class="pno">3</div><div><b>ML Model 1 — Resume Classifier · W5–6</b><p>Data prep, TF-IDF baseline, DistilBERT fine-tune, evaluation, save + inference endpoint.</p></div></div>
+        <div class="phase"><div class="pno">4</div><div><b>ML Model 2 — Skill Extractor · W7–8</b><p>LLM-assisted weak labelling, multi-label DistilBERT, evaluation; wire into Skill Gap agent.</p></div></div>
+        <div class="phase"><div class="pno">5</div><div><b>Resume Architect + Learning · W9–10</b><p>Parse/build, classifier badge, ATS tailoring, PDF export; learning paths + cascade trigger.</p></div></div>
+        <div class="phase"><div class="pno">6</div><div><b>Mock Interview · W11–12</b><p>Edge-TTS + Whisper, live voice loop, panic control, feedback report.</p></div></div>
+        <div class="phase"><div class="pno">7</div><div><b>Career Path + Cascade · W13–14</b><p>Ladder + milestones, interconnected cascade end-to-end, model-inference hardening.</p></div></div>
+        <div class="phase"><div class="pno">8</div><div><b>Test, evaluate &amp; deploy · W15–16</b><p>Unit/integration/E2E tests, evaluation report (model F1 + LLM comparison), deploy to free tiers, dissertation.</p></div></div>
+      </div>
+      <div class="note">Recommended first step: set up the repo + Supabase schema + app shell (Phase 1). Everything else reads/writes that shared memory. Want me to scaffold the repo &amp; database schema next?</div>
+    </section>
+
+    <footer>PathCompanion AI — Planning Pack · clean-light wireframes · generated for CIS 6035</footer>
+  </main>
+</div>
+
+<script>
+  // wireframe tabs
+  var tabs=document.getElementById('tabs');
+  tabs.addEventListener('click',function(e){
+    var b=e.target.closest('button'); if(!b)return;
+    tabs.querySelectorAll('button').forEach(function(x){x.classList.remove('on')});
+    b.classList.add('on');
+    document.querySelectorAll('.wf').forEach(function(w){w.classList.remove('on')});
+    document.getElementById('wf-'+b.dataset.w).classList.add('on');
+  });
+  // active nav on scroll
+  var links=[].slice.call(document.querySelectorAll('#nav a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+  window.addEventListener('scroll',function(){
+    var y=window.scrollY+120,cur=0;
+    secs.forEach(function(s,i){if(s&&s.offsetTop<=y)cur=i});
+    links.forEach(function(a){a.classList.remove('active')});
+    if(links[cur])links[cur].classList.add('active');
+  });
+</script>
+</body>
+</html>

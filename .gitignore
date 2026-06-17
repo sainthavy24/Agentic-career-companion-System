@@ -1,0 +1,41 @@
+# --- secrets / env ---
+.env
+.env.local
+.env.*.local
+
+# --- python ---
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ipynb_checkpoints/
+
+# --- node / frontend ---
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# --- machine learning artefacts ---
+*.joblib
+*.pkl
+*.pt
+*.bin
+ml/checkpoints/
+ml/data/
+
+# --- os / editors ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# --- MS Office lock files ---
+~$*
+
+# stray / superseded files (locked from sandbox; delete in File Explorer when convenient)
+__probe_*.txt
+/Proposal_PathCompanionAI_EN.docx
+/Proposal_PathCompanionAI_TAMIL.docx
+/Proposal_PathCompanionAI_TAMIL.pdf
