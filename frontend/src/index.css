@@ -72,3 +72,10 @@ a{text-decoration:none;color:inherit}
 .grid{display:grid;gap:14px}
 .g2{grid-template-columns:1fr 1fr}
 @media(max-width:760px){.g2{grid-template-columns:1fr}}
+
+/* Career Path */
+.goalinput{flex:1;min-width:220px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px}
+.ladder-v{display:flex;flex-direction:column;gap:12px;margin-top:14px}
+.stagecard{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px}
+.stagehead{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.chip.neu{background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
