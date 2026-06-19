@@ -265,3 +265,26 @@ a{text-decoration:none;color:inherit}
 .datefield{display:flex;flex-direction:column;gap:4px}
 .dlabel{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.04em}
 .chkrow{grid-column:1/-1;display:flex;align-items:center;gap:8px;font-size:13px;font-weight:500;color:var(--muted)}
+
+/* ===== Job Scout redesign ===== */
+.livedotc{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--ok);margin-right:5px;animation:livedot 1.6s infinite}
+.searchbar{display:flex;align-items:center;gap:10px;background:var(--surface);border:1px solid var(--border);border-radius:12px;box-shadow:var(--shadow);padding:8px 14px;margin-bottom:18px}
+.searchbar .si{color:var(--muted)}
+.searchbar input{flex:1;border:0;outline:0;font-size:14px;background:transparent;color:var(--text)}
+.sortsel{border:1px solid var(--border);border-radius:9px;padding:7px 10px;font-size:13px;color:var(--text);background:var(--surface-2);cursor:pointer}
+
+.joblayout{display:grid;grid-template-columns:240px 1fr;gap:18px;align-items:start}
+.filters{position:sticky;top:20px;display:flex;flex-direction:column}
+.fcheck{display:flex;align-items:center;gap:9px;font-size:14px;color:var(--text);padding:7px 0;cursor:pointer}
+.linkbtn{border:0;background:transparent;color:var(--primary);font-size:13px;font-weight:600;cursor:pointer}
+
+.jobcard.rich{display:flex;gap:14px;padding:18px}
+.jlogo{width:46px;height:46px;flex:0 0 46px;border-radius:11px;color:#fff;font-weight:800;font-size:20px;display:flex;align-items:center;justify-content:center}
+.jbody{flex:1;min-width:0}
+.jtop{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.jtitle{font-size:16px}
+.matchpill{flex:0 0 auto;font-size:12px;font-weight:700;color:var(--primary);background:var(--primary-soft);border:1px solid #c7d2fe;padding:4px 11px;border-radius:999px}
+.jchips{margin:10px 0 2px}
+.loadmore{display:flex;flex-direction:column;align-items:center;gap:8px;padding:10px 0 4px}
+
+@media(max-width:900px){ .joblayout{grid-template-columns:1fr} .filters{position:static} }
