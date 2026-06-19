@@ -14,4 +14,9 @@ export async function apiPost(path, body) {
   return res.json()
 }
 
+export async function apiUpload(path, formData) {
+  const res = await fetch(`${API}${path}`, { method: 'POST', body: formData })
+  return res.json()
+}
+
 export { API }

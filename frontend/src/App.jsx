@@ -8,7 +8,7 @@ import SkillGap from './pages/SkillGap.jsx'
 import Resume from './pages/Resume.jsx'
 import CareerPath from './pages/CareerPath.jsx'
 import Learning from './pages/Learning.jsx'
-import Placeholder from './pages/Placeholder.jsx'
+import Interview from './pages/Interview.jsx'
 
 export default function App() {
   return (
@@ -23,7 +23,7 @@ export default function App() {
           <Route path="/resume" element={<Resume />} />
           <Route path="/career" element={<CareerPath />} />
           <Route path="/learning" element={<Learning />} />
-          <Route path="/interview" element={<Placeholder title="Mock Interview" color="#db2777" phase="Phase 8" desc="Voice interview, panic control, feedback report." />} />
+          <Route path="/interview" element={<Interview />} />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>
