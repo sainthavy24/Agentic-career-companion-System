@@ -8,52 +8,104 @@
 body{margin:0;font-family:'Segoe UI',-apple-system,Roboto,Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text)}
 a{text-decoration:none;color:inherit}
 .layout{display:flex;min-height:100vh}
-.sidebar{width:230px;background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
+
+/* ===== Sidebar ===== */
+.sidebar{width:240px;flex:0 0 240px;background:var(--surface);border-right:1px solid var(--border);padding:20px 14px;display:flex;flex-direction:column;gap:4px;position:sticky;top:0;height:100vh}
 .brand{display:flex;align-items:center;gap:10px;margin-bottom:18px}
 .brand.center{justify-content:center;margin-bottom:22px}
 .logo{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-weight:800;display:flex;align-items:center;justify-content:center}
 .brand b{font-size:15px}
 .brand small{display:block;color:var(--muted);font-size:11px}
 .nav{display:flex;flex-direction:column;gap:2px;margin-top:6px}
+.navgroup{display:flex;flex-direction:column;gap:2px}
+.navgroup + .navgroup{margin-top:14px}
+.navsection{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);opacity:.7;padding:0 12px;margin-bottom:4px}
 .navlink{display:flex;align-items:center;gap:10px;padding:9px 12px;border-radius:9px;color:var(--muted);font-size:14px;font-weight:500}
 .navlink:hover{background:var(--surface-2);color:var(--text)}
 .navlink.active{background:var(--primary-soft);color:var(--primary);font-weight:600}
-.navlink .dot{width:7px;height:7px;border-radius:50%;background:currentColor;opacity:.5}
 .navlink.login{margin-top:auto;border:1px solid var(--border);justify-content:center;color:var(--text)}
-.main{flex:1;padding:30px 36px;max-width:1000px}
-.topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
-.topbar h1{font-size:24px;margin:0}
+.ic{width:18px;height:18px;flex:0 0 18px}
+.userbox{margin-top:auto;display:flex;align-items:center;gap:10px;padding:10px;border:1px solid var(--border);border-radius:11px;background:var(--surface-2)}
+.uavatar{width:32px;height:32px;flex:0 0 32px;border-radius:50%;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center}
+.uemail{flex:1;font-size:12px;color:var(--text);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.signout{border:0;background:transparent;color:var(--muted);cursor:pointer;padding:4px;display:flex;border-radius:7px}
+.signout:hover{color:var(--bad);background:#fef2f2}
+.signout .ic{width:16px;height:16px}
+
+/* ===== Main (full width) ===== */
+.main{flex:1;min-width:0;padding:30px 44px;width:100%}
+.topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;margin-bottom:24px}
+.topbar h1{font-size:26px;margin:0}
+.sectiontitle{font-size:18px;margin:8px 0 14px}
+.iconbtn{width:38px;height:38px;border-radius:10px;border:1px solid var(--border);background:var(--surface);display:flex;align-items:center;justify-content:center;color:var(--muted);cursor:pointer}
+.iconbtn:hover{color:var(--primary);border-color:#c7d2fe}
+.iconbtn .ic{width:18px;height:18px}
 .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#94a3b8,#cbd5e1)}
 .badge{color:#fff;font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px}
+.muted{color:var(--muted)}
+.small{font-size:13px}
+
+/* status / pills */
 .status{padding:12px 16px;border-radius:12px;margin-bottom:18px;font-size:14px;border:1px solid var(--border);background:var(--surface)}
 .status.ok{background:#ecfdf5;border-color:#a7f3d0;color:var(--ok)}
 .status.bad{background:#fef2f2;border-color:#fecaca;color:var(--bad)}
-.cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
+.statuspill{display:inline-flex;align-items:center;gap:7px;font-size:12px;font-weight:600;padding:5px 12px;border-radius:999px;border:1px solid var(--border)}
+.statuspill.ok{background:#ecfdf5;border-color:#a7f3d0;color:var(--ok)}
+.statuspill.bad{background:#fef2f2;border-color:#fecaca;color:var(--bad)}
+.pilldot{width:7px;height:7px;border-radius:50%;background:currentColor}
+.statuspill.ok .pilldot{animation:livedot 1.6s infinite}
+@keyframes livedot{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* ===== Stat cards ===== */
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px}
+.statcard{display:flex;align-items:center;gap:16px;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
+.staticon{width:48px;height:48px;flex:0 0 48px;border-radius:12px;display:flex;align-items:center;justify-content:center}
+.staticon .ic{width:24px;height:24px}
+.num{font-size:34px;font-weight:800;color:var(--text);display:block;line-height:1.1}
+.bar{margin-top:10px;height:8px;border-radius:999px;background:#ede9fe;overflow:hidden}
+.bar span{display:block;height:100%;border-radius:999px;background:linear-gradient(90deg,#7c3aed,#4f46e5);transition:width .5s ease}
+
+/* keep old card class for any leftover use */
 .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:18px}
-.card .num{font-size:26px;color:var(--primary);display:block}
-.card span{color:var(--muted);font-size:13px}
-.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px 22px}
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:22px 24px}
 .panel h3{margin:0 0 8px}
-.muted{color:var(--muted)}
-.small{font-size:13px}
+
+/* ===== Agent grid ===== */
+.agentgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin-bottom:26px}
+.agentcard{position:relative;display:flex;flex-direction:column;gap:8px;background:var(--surface);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow);padding:20px;transition:transform .12s ease,box-shadow .12s ease,border-color .12s ease}
+.agentcard:hover{transform:translateY(-3px);box-shadow:0 6px 14px rgba(16,24,40,.08),0 16px 36px rgba(16,24,40,.12);border-color:#d6dbe8}
+.agenttop{display:flex;align-items:center;justify-content:space-between;margin-bottom:2px}
+.agenticon{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center}
+.agenticon .ic{width:22px;height:22px}
+.agentbadge{font-size:10px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--primary);background:var(--primary-soft);border:1px solid #c7d2fe;padding:3px 9px;border-radius:999px}
+.agentcard b{font-size:16px}
+.adesc{line-height:1.5;min-height:42px}
+.agentgo{font-size:14px;font-weight:600;margin-top:4px}
+
+/* ===== Recommended panel ===== */
+.reco{display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;background:linear-gradient(135deg,#eef2ff,#faf5ff);border:1px solid #e0e7ff;border-radius:16px;padding:22px 24px}
+.recolabel{font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--primary)}
+
+/* ===== Auth ===== */
 .auth{min-height:100vh;display:flex;align-items:center;justify-content:center;background:var(--bg)}
 .authcard{background:var(--surface);border:1px solid var(--border);border-radius:18px;box-shadow:var(--shadow);padding:30px;width:340px}
 .authcard h2{margin:0 0 16px;font-size:20px}
 .authcard form{display:flex;flex-direction:column;gap:10px}
 .authcard input{padding:10px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px}
-.btn{background:var(--primary);color:#fff;border:0;border-radius:9px;padding:10px;font-size:14px;font-weight:600;cursor:pointer}
+.btn{background:var(--primary);color:#fff;border:0;border-radius:9px;padding:10px 16px;font-size:14px;font-weight:600;cursor:pointer;display:inline-block}
+.btn:hover{filter:brightness(.96)}
 .btn.ghost{background:var(--surface);color:var(--text);border:1px solid var(--border)}
+.btn.small{padding:5px 10px;font-size:12px}
 .msg{font-size:13px;color:var(--muted);margin-top:10px}
 
-/* Job Scout */
+/* ===== Job Scout ===== */
 .joblist{display:flex;flex-direction:column;gap:12px}
 .jobcard{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:16px 18px}
 .jobhead{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:4px}
 .jobhead b{font-size:15px}
 .jobdesc{color:var(--muted);font-size:13px;margin:8px 0 0;line-height:1.5}
-.btn.small{padding:5px 10px;font-size:12px}
 
-/* Profile / skills */
+/* ===== Profile / skills ===== */
 .skillform{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px}
 .skillform input[type=text],.skillform input:not([type]){flex:1;min-width:160px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px}
 .skillwrap{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
@@ -62,25 +114,24 @@ a{text-decoration:none;color:inherit}
 .skillchip .x{border:0;background:transparent;color:var(--muted);cursor:pointer;font-size:16px;line-height:1;padding:0}
 .skillchip .x:hover{color:#dc2626}
 
-/* match chips */
+/* ===== match chips ===== */
 .chip{display:inline-block;font-size:11px;font-weight:600;padding:2px 9px;border-radius:999px;margin:2px 4px 2px 0}
 .chip.ok{background:#ecfdf5;color:#059669;border:1px solid #a7f3d0}
 .chip.miss{background:#fef2f2;color:#dc2626;border:1px solid #fecaca}
+.chip.neu{background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
 
-/* ML pages */
+/* ===== ML pages ===== */
 .ta{width:100%;min-height:160px;border:1px solid var(--border);border-radius:10px;padding:12px;font-size:13px;font-family:inherit;margin:10px 0;resize:vertical;box-sizing:border-box}
 .grid{display:grid;gap:14px}
 .g2{grid-template-columns:1fr 1fr}
-@media(max-width:760px){.g2{grid-template-columns:1fr}}
 
-/* Career Path */
+/* ===== Career / Learning ===== */
 .goalinput{flex:1;min-width:220px;padding:9px 12px;border:1px solid var(--border);border-radius:9px;font-size:14px}
 .ladder-v{display:flex;flex-direction:column;gap:12px;margin-top:14px}
 .stagecard{background:var(--surface);border:1px solid var(--border);border-left:3px solid var(--primary);border-radius:12px;box-shadow:var(--shadow);padding:14px 16px}
 .stagehead{display:flex;justify-content:space-between;align-items:center;gap:8px}
-.chip.neu{background:var(--surface-2);color:var(--muted);border:1px solid var(--border)}
 
-/* Mock interview */
+/* ===== Mock interview ===== */
 .voice{width:64px;height:64px;border-radius:50%;background:linear-gradient(135deg,#db2777,#f472b6);margin:6px auto;display:flex;align-items:center;justify-content:center;color:#fff;font-size:22px;font-weight:700}
 .voice.ring{box-shadow:0 0 0 6px #fce7f3;animation:pulse 1s infinite}
 @keyframes pulse{0%{box-shadow:0 0 0 4px #fce7f3}50%{box-shadow:0 0 0 10px #fbcfe8}100%{box-shadow:0 0 0 4px #fce7f3}}
@@ -88,3 +139,22 @@ a{text-decoration:none;color:inherit}
 .overlaycard{background:var(--surface);border-radius:16px;padding:28px;text-align:center;max-width:320px;box-shadow:var(--shadow)}
 .breathe{width:70px;height:70px;border-radius:50%;background:#a7f3d0;margin:14px auto;animation:breathe 8s ease-in-out infinite}
 @keyframes breathe{0%,100%{transform:scale(.7);background:#a7f3d0}50%{transform:scale(1.2);background:#6ee7b7}}
+
+/* ===== Responsive ===== */
+@media(max-width:1180px){
+  .statgrid,.agentgrid{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:820px){
+  .layout{flex-direction:column}
+  .sidebar{width:100%;flex:none;height:auto;position:static;flex-direction:row;flex-wrap:wrap;align-items:center;gap:8px;padding:12px 14px}
+  .brand{margin-bottom:0}
+  .nav{flex-direction:row;flex-wrap:wrap;margin-top:0;flex:1}
+  .navgroup{flex-direction:row;flex-wrap:wrap}
+  .navgroup + .navgroup{margin-top:0}
+  .navsection{display:none}
+  .navlink{padding:7px 10px;font-size:13px}
+  .userbox{margin-top:0;width:auto}
+  .uemail{max-width:120px}
+  .main{padding:20px 16px}
+  .statgrid,.agentgrid,.g2{grid-template-columns:1fr}
+}
