@@ -11,7 +11,7 @@ def _clean(text: str) -> str:
         return ""
     text = re.sub(r"<[^>]+>", " ", text)        # strip HTML tags
     text = re.sub(r"\s+", " ", text).strip()
-    return text[:600]
+    return text[:4000]
 
 
 async def fetch_remotive(limit: int = 50):

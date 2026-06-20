@@ -19,11 +19,31 @@ def classify_resume(text: str) -> str:
     return str(_m1.predict([text or ""])[0])
 
 
-def extract_skills(text: str) -> list:
-    """Model 2 — extract required skills (multi-label)."""
+def extract_skills(text: str, threshold: float = 0.15, top_k: int = 5) -> list:
+    """Model 2 — extract a role's focus areas (multi-label).
+
+    The base 0.5 decision threshold is too strict (many postings returned
+    nothing), so we rank labels by probability and keep those above a lower
+    threshold, most-relevant first. If none clear the threshold we fall back
+    to the single best guess (when plausible) so a real posting is rarely
+    empty. "Other" is dropped as a non-informative catch-all class.
+    """
     global _m2
     if _m2 is None:
         _m2 = joblib.load(M2)               # {"vectorizer","clf","labels"}
     vec, clf, labels = _m2["vectorizer"], _m2["clf"], _m2["labels"]
-    pred = clf.predict(vec.transform([text or ""]))[0]
-    return [labels[i] for i, v in enumerate(pred) if v == 1]
+    X = vec.transform([text or ""])
+
+    if hasattr(clf, "predict_proba"):
+        probs = clf.predict_proba(X)[0]
+        ranked = sorted(
+            ((labels[i], float(p)) for i, p in enumerate(probs) if labels[i] != "Other"),
+            key=lambda t: t[1], reverse=True,
+        )
+        picked = [lbl for lbl, p in ranked if p >= threshold][:top_k]
+        if not picked and ranked and ranked[0][1] >= 0.08:
+            picked = [ranked[0][0]]
+        return picked
+
+    pred = clf.predict(X)[0]                 # fallback if no proba
+    return [labels[i] for i, v in enumerate(pred) if v == 1 and labels[i] != "Other"]

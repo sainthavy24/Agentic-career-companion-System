@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { apiGet, apiPost } from '../lib/api.js'
 import { useUser } from '../lib/useUser.js'
 
@@ -9,6 +9,7 @@ function ago(d) { if (!d) return ''; const s = (Date.now() - new Date(d).getTime
 
 export default function Jobs() {
   const user = useUser()
+  const nav = useNavigate()
   const [jobs, setJobs] = useState([])
   const [matches, setMatches] = useState([])
   const [syncing, setSyncing] = useState(false)
@@ -130,8 +131,9 @@ export default function Jobs() {
                     {x.missing.slice(0, 3).map(s => <span key={s} className="chip miss">{s}</span>)}
                   </div>
                   {j.description && <p className="jobdesc">{j.description.slice(0, 180)}{j.description.length > 180 ? '…' : ''}</p>}
-                  <div style={{ marginTop: 10 }}>
+                  <div style={{ marginTop: 10, display: 'flex', gap: 8, flexWrap: 'wrap' }}>
                     <a href={j.url} target="_blank" rel="noreferrer" className="btn small">View Details ↗</a>
+                    {j.description && <button className="btn ghost small" onClick={() => nav('/skill-gap', { state: { jd: j.description || '', title: j.title } })}>Analyze gap</button>}
                   </div>
                 </div>
               </div>
