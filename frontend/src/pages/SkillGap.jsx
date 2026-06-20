@@ -79,7 +79,7 @@ export default function SkillGap() {
       </div>
 
       <div className="sgtop">
-        <div className="panel">
+        <div className="panel accent-indigo">
           <div className="stagehead" style={{ marginBottom: 8 }}>
             <h3 style={{ margin: 0 }}>Job Description</h3>
             {from && <span className="chip ok" style={{ margin: 0 }}>Loaded: {from}</span>}
@@ -91,7 +91,7 @@ export default function SkillGap() {
           {empty && <p className="muted small" style={{ marginTop: 10 }}>Model 2 didn't detect clear focus areas. Try a more detailed description.</p>}
         </div>
 
-        <div className="panel readycard">
+        <div className="panel readycard accent-indigo">
           <h3 style={{ marginTop: 0 }}>Market Readiness</h3>
           {res && !empty ? (
             <>
@@ -111,7 +111,7 @@ export default function SkillGap() {
       {res && !empty && (
         <>
           <div className="sgcols">
-            <div className="panel">
+            <div className="panel accent-green">
               <div className="stagehead"><h3 style={{ margin: 0, color: '#059669' }}>You cover ({present.length})</h3><span className="okdot">✓</span></div>
               {present.length ? present.map(s => (
                 <div className="coverrow" key={s}>
@@ -121,7 +121,7 @@ export default function SkillGap() {
               )) : <div className="emptybox">Your current skills don't cover these areas yet.</div>}
             </div>
 
-            <div className="panel">
+            <div className="panel accent-purple">
               <div className="stagehead"><h3 style={{ margin: 0, color: 'var(--primary)' }}>Gaps ({missing.length})</h3></div>
               {missing.length ? missing.map(s => (
                 <div className="gaprow" key={s}>

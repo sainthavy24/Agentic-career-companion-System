@@ -318,3 +318,50 @@ a{text-decoration:none;color:inherit}
 .insight .btn.ghost:hover{background:rgba(255,255,255,.1)}
 
 @media(max-width:900px){ .sgtop,.sgcols{grid-template-columns:1fr} }
+
+/* ===== Resume Architect ===== */
+.dropzone{display:flex;flex-direction:column;align-items:center;gap:4px;text-align:center;border:2px dashed #c7d2fe;background:var(--primary-soft);border-radius:14px;padding:24px;cursor:pointer;transition:all .12s ease;margin:6px 0 12px}
+.dropzone:hover{border-color:var(--primary);background:#e8edff}
+.dropzone b{font-size:14px}
+.dzicon{width:40px;height:40px;border-radius:50%;background:var(--primary);color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;margin-bottom:4px}
+.bigcat{font-size:26px;font-weight:800;color:var(--ok);margin:6px 0 4px;text-transform:capitalize}
+
+/* ===== Resume Architect redesign ===== */
+.resumegrid{display:grid;grid-template-columns:1fr 1.4fr;gap:18px;align-items:start;margin-bottom:18px}
+.leftcol{display:flex;flex-direction:column;gap:16px}
+.btn.grad{background:linear-gradient(135deg,#4f46e5,#7c3aed)}
+.btn.full{width:100%}
+.filechip{display:flex;align-items:center;justify-content:space-between;gap:10px;background:var(--surface-2);border:1px solid var(--border);border-radius:10px;padding:10px 12px;margin:0 0 12px;font-size:13px}
+.filechip button{border:0;background:transparent;color:var(--muted);font-size:18px;cursor:pointer;line-height:1}
+.filechip button:hover{color:var(--bad)}
+
+.career-card{display:flex;align-items:center;justify-content:space-between;gap:12px;background:linear-gradient(135deg,#4f46e5,#7c3aed);color:#fff;border-radius:16px;padding:18px 20px;box-shadow:var(--shadow)}
+.cc-label{font-size:11px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;opacity:.8;display:block}
+.career-card b{font-size:16px;display:block;margin:4px 0 2px}
+.cc-sub{font-size:13px;opacity:.85}
+.cc-arrow{width:40px;height:40px;flex:0 0 40px;border-radius:50%;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px}
+
+.resultcard{display:flex;flex-direction:column}
+.confring{width:170px;height:170px;border-radius:50%;margin:14px auto 6px;display:flex;align-items:center;justify-content:center}
+.confinner{width:132px;height:132px;border-radius:50%;background:var(--surface);display:flex;flex-direction:column;align-items:center;justify-content:center}
+.confinner b{font-size:34px;font-weight:800;color:var(--text);line-height:1}
+.confinner small{font-size:10px;font-weight:700;letter-spacing:.1em;color:var(--muted);margin-top:2px}
+.bigcat.center{text-align:center;font-size:28px}
+
+.resumecards3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.icard{background:var(--surface);border:1px solid var(--border);border-left:4px solid var(--primary);border-radius:14px;box-shadow:var(--shadow);padding:18px 20px}
+.icard.purple{border-left-color:#7c3aed}
+.icard.teal{border-left-color:#0891b2}
+.icard.orange{border-left-color:#ea580c}
+.icard b{font-size:14px}
+.icard ul{margin:10px 0 0;padding-left:18px}
+.icard li{font-size:13px;color:var(--muted);margin-bottom:6px;line-height:1.45}
+
+@media(max-width:900px){ .resumegrid{grid-template-columns:1fr} .resumecards3{grid-template-columns:1fr} }
+
+/* ===== reusable colored-accent panels (match Resume info cards) ===== */
+.panel.accent-green{border-left:4px solid #059669}
+.panel.accent-purple{border-left:4px solid #7c3aed}
+.panel.accent-indigo{border-left:4px solid #4f46e5}
+.panel.accent-teal{border-left:4px solid #0891b2}
+.panel.accent-orange{border-left:4px solid #ea580c}

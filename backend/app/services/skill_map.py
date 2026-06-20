@@ -80,3 +80,37 @@ def skills_to_categories(skills: list) -> set:
     for sk in skills or []:
         out |= skill_to_categories(sk)
     return out
+
+
+# --- concrete skill tokens for "Key Strengths" detection in resume text ---
+import re as _re
+
+SKILL_TOKENS = {
+    "Python": ["python"], "Java": ["java"], "JavaScript": ["javascript"], "TypeScript": ["typescript"],
+    "React": ["react"], "Angular": ["angular"], "Vue": ["vue"], "Node.js": ["node.js", "nodejs"],
+    "HTML": ["html"], "CSS": ["css"], "SQL": ["sql"], "AWS": ["aws", "amazon web services"],
+    "Azure": ["azure"], "GCP": ["google cloud"], "Docker": ["docker"], "Kubernetes": ["kubernetes", "k8s"],
+    "Linux": ["linux"], "Git": ["git"], "REST APIs": ["rest api", "rest apis", "restful"], "GraphQL": ["graphql"],
+    "Machine Learning": ["machine learning"], "Deep Learning": ["deep learning"], "NLP": ["nlp"],
+    "Data Analysis": ["data analysis", "data analytics"], "Excel": ["excel"], "Power BI": ["power bi"],
+    "Tableau": ["tableau"], "Figma": ["figma"], "UI/UX": ["ui/ux", "user experience"], "Photoshop": ["photoshop"],
+    "Agile": ["agile"], "Scrum": ["scrum"], "Project Management": ["project management"],
+    "Selenium": ["selenium"], "Testing": ["testing"], "SEO": ["seo"], "Marketing": ["marketing"],
+    "Salesforce": ["salesforce"], "Accounting": ["accounting"], "C++": ["c\\+\\+"], "C#": ["c#"],
+    "Django": ["django"], "Flask": ["flask"], "Spring": ["spring boot", "spring framework"],
+    "TensorFlow": ["tensorflow"], "PyTorch": ["pytorch"], "Pandas": ["pandas"], "MongoDB": ["mongodb"],
+    "PostgreSQL": ["postgresql", "postgres"], "Redis": ["redis"], "CI/CD": ["ci/cd"], "DevOps": ["devops"],
+}
+
+
+def detect_skills(text: str, cap: int = 12) -> list:
+    """Find concrete, recognisable skills mentioned in resume text."""
+    t = (text or "").lower()
+    found = []
+    for disp, kws in SKILL_TOKENS.items():
+        for kw in kws:
+            pat = r"(?<![a-z0-9])" + kw + r"(?![a-z0-9+#])" if kw not in ("c\\+\\+", "c#") else r"(?<![a-z0-9])" + kw
+            if _re.search(pat, t):
+                found.append(disp)
+                break
+    return found[:cap]

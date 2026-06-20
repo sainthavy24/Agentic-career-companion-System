@@ -19,6 +19,20 @@ def classify_resume(text: str) -> str:
     return str(_m1.predict([text or ""])[0])
 
 
+def classify_resume_top(text: str, k: int = 3) -> list:
+    """Model 1 — top-k predicted categories with confidence."""
+    global _m1
+    if _m1 is None:
+        _m1 = joblib.load(M1)
+    if hasattr(_m1, "predict_proba"):
+        import numpy as np
+        probs = _m1.predict_proba([text or ""])[0]
+        classes = _m1.classes_
+        idx = np.argsort(probs)[::-1][:k]
+        return [{"category": str(classes[i]), "prob": round(float(probs[i]), 3)} for i in idx]
+    return [{"category": classify_resume(text), "prob": None}]
+
+
 def extract_skills(text: str, threshold: float = 0.15, top_k: int = 5) -> list:
     """Model 2 — extract a role's focus areas (multi-label).
 
