@@ -2,7 +2,7 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, UploadFile, File
 from pydantic import BaseModel
-from app.services.interview import next_question, feedback
+from app.services.interview import next_question, feedback, coach
 from app.services.groq_svc import transcribe
 
 router = APIRouter()
@@ -24,6 +24,12 @@ class FReq(BaseModel):
     history: List[QA] = []
 
 
+class CReq(BaseModel):
+    role: str
+    question: str = ""
+    answer: str = ""
+
+
 @router.post("/question")
 def question(req: QReq):
     try:
@@ -37,6 +43,14 @@ async def transcribe_audio(file: UploadFile = File(...)):
     try:
         data = await file.read()
         return {"text": transcribe(file.filename or "answer.webm", data)}
+    except Exception as e:
+        raise HTTPException(500, str(e))
+
+
+@router.post("/coach")
+def coach_ep(req: CReq):
+    try:
+        return coach(req.role, req.question, req.answer)
     except Exception as e:
         raise HTTPException(500, str(e))
 

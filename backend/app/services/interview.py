@@ -27,3 +27,25 @@ def feedback(role, history):
         return json.loads(m.group(0) if m else txt)
     except Exception:
         return {"score": None, "summary": txt, "tips": []}
+
+
+def coach(role, question, answer):
+    """Per-answer coaching: react, score, and show a model answer."""
+    prompt = (
+        f"You are an expert, encouraging interview coach preparing a candidate for a {role} interview.\n"
+        f"Interview question: {question}\n"
+        f"Candidate's answer: {answer or '(no answer given)'}\n\n"
+        "Coach this single answer. Be honest but supportive. Return ONLY JSON:\n"
+        '{"verdict":"strong|okay|weak","score":<integer 1-10>,'
+        '"reaction":"one short sentence reacting like a real interviewer",'
+        '"good":"what they did well (one line; empty string if nothing)",'
+        '"improve":"the most important thing to improve (one line)",'
+        '"model_answer":"a concise, strong example answer, 2-4 sentences"}'
+        " No markdown, JSON only."
+    )
+    txt = chat([{"role": "user", "content": prompt}], temperature=0.4)
+    m = re.search(r"\{.*\}", txt, re.S)
+    try:
+        return json.loads(m.group(0) if m else txt)
+    except Exception:
+        return {"verdict": None, "score": None, "reaction": txt, "good": "", "improve": "", "model_answer": ""}

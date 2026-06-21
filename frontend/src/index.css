@@ -387,3 +387,7 @@ a{text-decoration:none;color:inherit}
 .lpmark{margin-top:18px;background:#059669;padding:11px 20px}
 .lpmark:disabled{opacity:.7;cursor:default}
 @media(max-width:680px){ .lpcard{flex-wrap:wrap} .lpfind{width:100%;text-align:center} }
+
+/* ===== Mock Interview coaching ===== */
+.coachcard{animation:toastin .25s ease}
+.modelans{margin-top:12px;background:var(--surface-2);border:1px solid var(--border);border-radius:11px;padding:14px 16px}
