@@ -1,6 +1,7 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import { apiPost, apiUpload } from '../lib/api.js'
+import { getCache, setCache } from '../lib/store.js'
 
 const CAT_DESC = {
   'ENGINEERING': 'Strong technical profile detected for software & engineering roles.',
@@ -21,13 +22,15 @@ const TIPS = [
 ]
 
 export default function Resume() {
-  const [text, setText] = useState('')
-  const [res, setRes] = useState(null)
+  const c0 = getCache('resume') || {}
+  const [text, setText] = useState(c0.text || '')
+  const [res, setRes] = useState(c0.res || null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
-  const [fileName, setFileName] = useState('')
+  const [fileName, setFileName] = useState(c0.fileName || '')
   const [showPaste, setShowPaste] = useState(false)
   const fileRef = useRef(null)
+  useEffect(() => { setCache('resume', { text, res, fileName }) }, [text, res, fileName])
 
   function showError(d) { setMsg(typeof d === 'string' ? d : (d?.detail || 'Failed.')) }
 

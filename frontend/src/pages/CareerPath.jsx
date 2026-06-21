@@ -1,13 +1,16 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { apiPost } from '../lib/api.js'
+import { getCache, setCache } from '../lib/store.js'
 import { useUser } from '../lib/useUser.js'
 
 export default function CareerPath() {
   const user = useUser()
-  const [goal, setGoal] = useState('')
-  const [stages, setStages] = useState(null)
+  const c0 = getCache('career') || {}
+  const [goal, setGoal] = useState(c0.goal || '')
+  const [stages, setStages] = useState(c0.stages || null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
+  useEffect(() => { setCache('career', { goal, stages }) }, [goal, stages])
 
   async function plan() {
     if (!goal.trim()) { setMsg('Enter a target role or career goal.'); return }

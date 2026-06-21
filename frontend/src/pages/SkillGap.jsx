@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { apiPost } from '../lib/api.js'
+import { getCache, setCache } from '../lib/store.js'
 import { useUser } from '../lib/useUser.js'
 
 const FOCUS = {
@@ -35,12 +36,14 @@ export default function SkillGap() {
   const user = useUser()
   const loc = useLocation()
   const nav = useNavigate()
-  const [text, setText] = useState('')
-  const [from, setFrom] = useState('')
-  const [res, setRes] = useState(null)
+  const c0 = getCache('skillgap') || {}
+  const [text, setText] = useState(c0.text || '')
+  const [from, setFrom] = useState(c0.from || '')
+  const [res, setRes] = useState(c0.res || null)
   const [busy, setBusy] = useState(false)
   const [msg, setMsg] = useState('')
-  const [dismiss, setDismiss] = useState(false)
+  const [dismiss, setDismiss] = useState(c0.dismiss || false)
+  useEffect(() => { setCache('skillgap', { text, from, res, dismiss }) }, [text, from, res, dismiss])
 
   async function analyze(t, ttl) {
     const jd = (t ?? text)
