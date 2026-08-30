@@ -6,9 +6,11 @@ import Profile from './pages/Profile.jsx'
 import Jobs from './pages/Jobs.jsx'
 import SkillGap from './pages/SkillGap.jsx'
 import Resume from './pages/Resume.jsx'
+import ResumeBuilder from './pages/ResumeBuilder.jsx'
 import CareerPath from './pages/CareerPath.jsx'
 import Learning from './pages/Learning.jsx'
 import Interview from './pages/Interview.jsx'
+import MockExam from './pages/MockExam.jsx'
 
 export default function App() {
   return (
@@ -21,9 +23,11 @@ export default function App() {
           <Route path="/jobs" element={<Jobs />} />
           <Route path="/skill-gap" element={<SkillGap />} />
           <Route path="/resume" element={<Resume />} />
+          <Route path="/resume-builder" element={<ResumeBuilder />} />
           <Route path="/career" element={<CareerPath />} />
           <Route path="/learning" element={<Learning />} />
           <Route path="/interview" element={<Interview />} />
+          <Route path="/exam" element={<MockExam />} />
         </Route>
         <Route path="*" element={<Navigate to="/" />} />
       </Routes>

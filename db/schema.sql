@@ -264,5 +264,21 @@ create trigger on_auth_user_created
   for each row execute function handle_new_user();
 
 -- ============================================================
---  Done. 12 tables + agent_events, pgvector, HNSW, RLS enabled.
+-- 13. exam_results  (Mock exam sessions & scores)
+-- ============================================================
+create table if not exists exam_results (
+  id              uuid primary key default gen_random_uuid(),
+  user_id         uuid not null references auth.users(id) on delete cascade,
+  subject         text not null,
+  score           numeric(5,2) not null,
+  total_questions int not null,
+  correct_answers int not null,
+  created_at      timestamptz default now()
+);
+create index if not exists idx_exams_user on exam_results(user_id);
+alter table exam_results enable row level security;
+create policy "own exam rows" on exam_results for all using (auth.uid() = user_id) with check (auth.uid() = user_id);
+
+-- ============================================================
+--  Done. 13 tables + agent_events, pgvector, HNSW, RLS enabled.
 -- ============================================================

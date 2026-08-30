@@ -1,0 +1,101 @@
+%% Class Diagram — PathCompanion AI backend (Chapter 4: Design)
+%% Derived from backend/app routers + services
+classDiagram
+    direction LR
+
+    class JobsRouter {
+        +sync_jobs(limit) async
+        +list_jobs(limit)
+        +match_jobs(MatchReq)
+        +get_matches(user_id, limit)
+        +embed_models()
+    }
+    class SkillGapRouter {
+        +extract(AnalyzeReq)
+        +analyze(AnalyzeReq)
+    }
+    class LearningRouter {
+        +plan(PlanReq)
+    }
+    class ResumeRouter {
+        +classify(TextReq)
+        +classify_file(UploadFile) async
+    }
+    class InterviewRouter {
+        +question(QReq)
+        +transcribe_audio(UploadFile) async
+        +coach_ep(CReq)
+        +feedback(FReq)
+    }
+    class CareerRouter {
+        +plan(PlanReq)
+    }
+    class ExamRouter {
+        +generate_exam(ExamGenerateReq)
+        +submit_exam(ExamSubmitReq)
+        +email_certificate(EmailCertificateReq)
+    }
+    class ChatRouter {
+        +chat(ChatReq)
+    }
+
+    class JobsService {
+        +fetch_remotive(limit) async
+        +upsert_jobs(jobs) int
+    }
+    class MatchingService {
+        -_cosine(a, b)
+        +run_matching(user_id)
+    }
+    class EmbeddingsService {
+        +available_models()
+        +embed(text) vector~768~
+    }
+    class MLModelService {
+        +classify_resume(text) str
+        +classify_resume_top(text, k) list
+        +extract_skills(text, threshold, top_k) list
+    }
+    class SkillMapService {
+        +skill_to_categories(skill) set
+        +detect_skills(text, cap) list
+    }
+    class InterviewService {
+        +next_question(role, history, skills)
+        +feedback(role, history)
+        +coach(role, question, answer)
+    }
+    class LearningService {
+        +generate_plan(skill)
+    }
+    class CareerService {
+        +generate_path(goal, skills)
+    }
+    class GeminiService {
+        +generate_text(prompt) str
+        +generate_json(prompt)
+    }
+    class GroqService {
+        +chat(messages, temperature)
+        +transcribe(filename, data) str
+    }
+    class EmailService {
+        +send_certificate_email()
+    }
+
+    JobsRouter --> JobsService
+    JobsRouter --> MatchingService
+    MatchingService --> EmbeddingsService
+    SkillGapRouter --> MLModelService
+    SkillGapRouter --> SkillMapService
+    ResumeRouter --> MLModelService
+    InterviewRouter --> InterviewService
+    InterviewService --> GroqService
+    LearningRouter --> LearningService
+    CareerRouter --> CareerService
+    LearningService --> GeminiService
+    CareerService --> GeminiService
+    ChatRouter --> GroqService
+    ExamRouter --> GeminiService
+    ExamRouter --> EmailService
+    EmbeddingsService --> GeminiService : embeddings API

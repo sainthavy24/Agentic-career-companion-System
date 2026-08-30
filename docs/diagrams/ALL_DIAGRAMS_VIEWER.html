@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>PathCompanion AI — Dissertation Diagrams</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+<style>
+  body{font-family:Segoe UI,Arial,sans-serif;margin:0;background:#f5f6fa;color:#222}
+  header{background:#1a1a2e;color:#fff;padding:20px 32px}
+  header h1{margin:0;font-size:22px} header p{margin:4px 0 0;color:#aab;font-size:13px}
+  section{background:#fff;margin:24px auto;max-width:1250px;padding:24px 32px;border-radius:10px;box-shadow:0 1px 4px rgba(0,0,0,.08)}
+  h2{font-size:17px;border-bottom:2px solid #4f6ef7;padding-bottom:6px}
+  .chip{display:inline-block;background:#eef1ff;color:#4f6ef7;font-size:11px;padding:2px 8px;border-radius:10px;margin-left:8px;vertical-align:middle}
+  .mermaid{overflow-x:auto}
+  button{background:#4f6ef7;color:#fff;border:none;padding:6px 14px;border-radius:6px;cursor:pointer;font-size:12px;float:right;margin-top:-38px}
+  .note{font-size:12px;color:#777;margin-top:4px}
+</style>
+</head>
+<body>
+<header>
+  <h1>PathCompanion AI — Dissertation Diagrams (CIS 6035)</h1>
+  <p>Generated from the actual codebase (backend/app, db/schema.sql). Use "Download SVG" per diagram → insert into Word. For UML-strict versions, paste the .mermaid source into draw.io or mermaid.live.</p>
+</header>
+
+<section><h2>1. Use Case Diagram <span class="chip">Chapter 3 — Requirements</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+flowchart LR
+    User(["👤 Job Seeker / User"])
+    subgraph System["PathCompanion AI System"]
+        UC1(["Register / Login"])
+        UC2(["Manage Profile & Skills"])
+        UC3(["Discover & Match Jobs"])
+        UC4(["View Matched / Missing Skills"])
+        UC5(["Analyze Skill Gap"])
+        UC9x(["Extract Skills (Model 2)"])
+        UC6(["Generate Learning Plan"])
+        UC7(["Mark Skill as Learned"])
+        UC8(["Upload / Build Resume"])
+        UC9(["Classify Resume (Model 1)"])
+        UC10(["Attend Voice Mock Interview"])
+        UC11(["Use Panic Control"])
+        UC12(["Receive Interview Feedback"])
+        UC13(["Plan Career Path"])
+        UC14(["Take Mock Exam & Get Certificate"])
+        UC15(["Chat with AI Assistant"])
+    end
+    JobAPIs(["🌐 External Job APIs"])
+    Gemini(["🤖 Google Gemini"])
+    Groq(["⚡ Groq Llama / Whisper"])
+    Supabase(["🗄️ Supabase Auth"])
+    User --> UC1 & UC2 & UC3 & UC5 & UC6 & UC8 & UC10 & UC13 & UC14 & UC15
+    UC3 -.->|include| UC4
+    UC5 -.->|include| UC9x
+    UC6 -.->|extend| UC7
+    UC8 -.->|include| UC9
+    UC10 -.->|extend| UC11
+    UC10 -.->|include| UC12
+    UC1 --- Supabase
+    UC3 --- JobAPIs
+    UC6 & UC13 & UC15 --- Gemini
+    UC10 --- Groq
+</pre></section>
+
+<section><h2>2. System Architecture <span class="chip">Chapter 4 — Design</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+flowchart TB
+    subgraph Client["🖥️ Presentation Tier — React 18 + Vite"]
+        Pages["Pages: Dashboard · Jobs · SkillGap · Learning<br/>Resume · Interview · CareerPath · MockExam · Chatbot · Profile"]
+        Store["State (store.js) + Supabase JS client (auth)"]
+    end
+    subgraph Backend["⚙️ Application Tier — FastAPI (Python 3.11, async)"]
+        Routers["Routers (/api/v1)<br/>jobs · skillgap · learning · resume<br/>interview · career · exam · chat · assistant"]
+        subgraph Services["Service Layer"]
+            JobsSvc["jobs.py"]
+            MatchSvc["matching.py"]
+            EmbedSvc["embeddings.py"]
+            IntSvc["interview.py"]
+            LearnSvc["learning.py · career.py"]
+            LLMSvc["gemini.py · groq_svc.py"]
+            EmailSvc["email_svc.py"]
+        end
+        subgraph ML["🧠 ML Inference Module (ml_models.py)"]
+            M1["Model 1: Resume Classifier"]
+            M2["Model 2: Skill Extractor"]
+        end
+    end
+    subgraph Data["🗄️ Data Tier — Supabase (PostgreSQL + pgvector)"]
+        Tables["13 tables · Row-Level Security"]
+        Bus["agent_events (event bus → cascade)"]
+        HNSW["HNSW vector indexes (768-d)"]
+    end
+    subgraph Ext["🌐 External Services (free tier)"]
+        JobAPIs["Remotive · Adzuna · Arbeitnow"]
+        GeminiAPI["Gemini Flash + embeddings"]
+        GroqAPI["Groq Llama 3.3 70B · Whisper"]
+        TTS["Edge-TTS / Web Speech"]
+    end
+    Client -->|"REST + SSE"| Routers
+    Store -->|"Auth (JWT)"| Data
+    Routers --> Services
+    Routers --> ML
+    Services --> Data
+    JobsSvc --> JobAPIs
+    EmbedSvc & LLMSvc --> GeminiAPI
+    IntSvc --> GroqAPI
+    Client --> TTS
+</pre></section>
+
+<section><h2>3. Class Diagram (Backend) <span class="chip">Chapter 4 — Design</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+classDiagram
+    direction LR
+    class JobsRouter { +sync_jobs(limit) +list_jobs(limit) +match_jobs(MatchReq) +get_matches(user_id) }
+    class SkillGapRouter { +extract(AnalyzeReq) +analyze(AnalyzeReq) }
+    class LearningRouter { +plan(PlanReq) }
+    class ResumeRouter { +classify(TextReq) +classify_file(UploadFile) }
+    class InterviewRouter { +question(QReq) +transcribe_audio(UploadFile) +coach_ep(CReq) +feedback(FReq) }
+    class CareerRouter { +plan(PlanReq) }
+    class ExamRouter { +generate_exam() +submit_exam() +email_certificate() }
+    class ChatRouter { +chat(ChatReq) }
+    class JobsService { +fetch_remotive(limit) +upsert_jobs(jobs) }
+    class MatchingService { -_cosine(a,b) +run_matching(user_id) }
+    class EmbeddingsService { +embed(text) vector768 }
+    class MLModelService { +classify_resume(text) +classify_resume_top(text,k) +extract_skills(text,threshold,top_k) }
+    class SkillMapService { +skill_to_categories(skill) +detect_skills(text) }
+    class InterviewService { +next_question() +feedback() +coach() }
+    class LearningService { +generate_plan(skill) }
+    class CareerService { +generate_path(goal,skills) }
+    class GeminiService { +generate_text(prompt) +generate_json(prompt) }
+    class GroqService { +chat(messages) +transcribe(filename,data) }
+    class EmailService { +send_certificate_email() }
+    JobsRouter --> JobsService
+    JobsRouter --> MatchingService
+    MatchingService --> EmbeddingsService
+    SkillGapRouter --> MLModelService
+    SkillGapRouter --> SkillMapService
+    ResumeRouter --> MLModelService
+    InterviewRouter --> InterviewService
+    InterviewService --> GroqService
+    LearningRouter --> LearningService
+    CareerRouter --> CareerService
+    LearningService --> GeminiService
+    CareerService --> GeminiService
+    ChatRouter --> GroqService
+    ExamRouter --> GeminiService
+    ExamRouter --> EmailService
+    EmbeddingsService --> GeminiService : embeddings API
+</pre></section>
+
+<section><h2>4. ER Diagram (13 tables) <span class="chip">Chapter 4 — Design</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+erDiagram
+    AUTH_USERS ||--|| PROFILES : "1:1"
+    AUTH_USERS ||--o{ SKILLS : has
+    AUTH_USERS ||--o{ MATCHES : has
+    AUTH_USERS ||--o{ GAP_ANALYSES : has
+    AUTH_USERS ||--o{ LEARNING_PLANS : has
+    AUTH_USERS ||--o{ RESUMES : has
+    AUTH_USERS ||--o{ INTERVIEW_SESSIONS : has
+    AUTH_USERS ||--o{ CAREER_PATHS : has
+    AUTH_USERS ||--o{ AGENT_EVENTS : emits
+    AUTH_USERS ||--o{ EXAM_RESULTS : has
+    JOB_POSTINGS ||--o{ MATCHES : "matched in"
+    JOB_POSTINGS ||--o{ GAP_ANALYSES : "analyzed for"
+    JOB_POSTINGS ||--o{ RESUMES : "tailored for"
+    JOB_POSTINGS ||--o{ INTERVIEW_SESSIONS : "practiced for"
+    GAP_ANALYSES ||--o{ LEARNING_PLANS : generates
+    INTERVIEW_SESSIONS ||--o{ INTERVIEW_TURNS : contains
+    CAREER_PATHS ||--o{ MILESTONES : contains
+    PROFILES { uuid id PK  text full_name  text target_role  text location  jsonb prefs }
+    SKILLS { uuid id PK  uuid user_id FK  text name  int proficiency  text source }
+    JOB_POSTINGS { uuid id PK  text source  text title  text company  boolean remote  vector_768 embedding }
+    MATCHES { uuid id PK  uuid user_id FK  uuid job_id FK  numeric score  text_arr matched_skills  text_arr missing_skills }
+    GAP_ANALYSES { uuid id PK  uuid user_id FK  uuid job_id FK  jsonb present_skills  jsonb missing_skills  text status }
+    LEARNING_PLANS { uuid id PK  uuid user_id FK  uuid gap_id FK  text skill_name  jsonb resources  int progress }
+    RESUMES { uuid id PK  uuid user_id FK  uuid job_id FK  text type  text category  int ats_score  vector_768 embedding  boolean needs_refresh }
+    INTERVIEW_SESSIONS { uuid id PK  uuid user_id FK  uuid job_id FK  int anxiety_pre  int anxiety_post  numeric score }
+    INTERVIEW_TURNS { uuid id PK  uuid session_id FK  int idx  text question  text answer_transcript  jsonb feedback }
+    CAREER_PATHS { uuid id PK  uuid user_id FK  text goal  jsonb stages }
+    MILESTONES { uuid id PK  uuid path_id FK  text stage_name  text_arr required_skills  int duration_months }
+    AGENT_EVENTS { uuid id PK  uuid user_id FK  text type  jsonb payload  boolean processed }
+    EXAM_RESULTS { uuid id PK  uuid user_id FK  text subject  numeric score  int total_questions  int correct_answers }
+</pre></section>
+
+<section><h2>5. Sequence — Skill-Learned Cascade (USP) <span class="chip">Chapter 4/5</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as React Frontend
+    participant LR as Learning Router
+    participant DB as Supabase (shared memory)
+    participant EV as agent_events (bus)
+    participant M2 as Model 2 Skill Extractor
+    participant GA as Skill Gap Agent
+    participant RA as Resume Architect
+    U->>FE: Mark skill "Docker" as learned
+    FE->>LR: POST /learning/complete
+    LR->>DB: UPDATE skills (source='learning')
+    LR->>EV: INSERT {type: skill_learned}
+    LR-->>FE: 200 OK (UI not blocked)
+    FE-->>U: ✅ Skill saved instantly
+    Note over EV,RA: Background cascade (< 30 s)
+    EV->>GA: skill_learned consumed
+    GA->>M2: re-extract skills for open analyses
+    M2-->>GA: present / missing skills
+    GA->>DB: UPDATE gap_analyses (refreshed)
+    GA->>DB: UPDATE learning_plans (progress)
+    EV->>RA: same event consumed
+    RA->>DB: UPDATE resumes SET needs_refresh=true
+    Note over U,DB: Next visit: fresh gap report + resume flag
+</pre></section>
+
+<section><h2>6. Sequence — Voice Mock Interview <span class="chip">Chapter 4/5</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+sequenceDiagram
+    autonumber
+    actor U as Candidate
+    participant FE as React Frontend
+    participant IR as Interview Router
+    participant GQ as Groq Llama 3.3
+    participant WH as Groq Whisper
+    participant TTS as TTS Engine
+    participant DB as Supabase
+    U->>FE: Start interview (job/role)
+    FE->>DB: read skills + job context
+    FE->>IR: POST /interview/question
+    IR->>GQ: contextual prompt
+    GQ-->>IR: adaptive question
+    IR-->>FE: question text
+    FE->>TTS: speak question
+    TTS-->>U: 🔊 spoken question
+    U->>FE: 🎤 spoken answer
+    FE->>IR: POST /interview/transcribe
+    IR->>WH: transcribe()
+    WH-->>IR: transcript
+    FE->>IR: POST /interview/coach
+    IR-->>FE: per-answer feedback
+    Note over FE: adaptive loop (< 2 s target)
+    opt Panic Button
+        U->>FE: 🆘 Panic
+        FE-->>U: pause + breathing + tips
+    end
+    U->>FE: End interview
+    FE->>IR: POST /interview/feedback
+    IR->>GQ: evaluate session
+    IR->>DB: save session + turns + anxiety pre/post
+    IR-->>FE: final report
+</pre></section>
+
+<section><h2>7. Activity — Resume Architect Flow <span class="chip">Chapter 4</span></h2>
+<button onclick="dl(this)">Download SVG</button>
+<pre class="mermaid">
+flowchart TD
+    Start([● Start]) --> Choice{Resume source?}
+    Choice -->|Upload PDF| Upload[/Upload resume PDF/]
+    Choice -->|Build in-app| Build[Profile-based builder]
+    Upload --> Extract[Extract text]
+    Extract --> Valid{Extracted OK?}
+    Valid -->|No| Err[Error: unreadable] --> Choice
+    Valid -->|Yes| M1[["🧠 Model 1: classify<br/>category + top-3 confidence"]]
+    Build --> M1
+    M1 --> Save[(Save master resume + category)]
+    Save --> Align{Category matches target role?}
+    Align -->|No| Warn[Alignment warning → suggest gap analysis]
+    Align -->|Yes| Pick[Select target job]
+    Warn --> Pick
+    Pick --> Tailor[Tailor + ATS keywords - Gemini]
+    Tailor --> ATS[Compute ATS score]
+    ATS --> Review{Approve?}
+    Review -->|Edit| Tailor
+    Review -->|Yes| Export[/Export PDF/]
+    Export --> SaveT[(Save tailored resume)]
+    SaveT --> End([◉ End])
+</pre></section>
+
+<script>
+mermaid.initialize({startOnLoad:true, theme:'default', securityLevel:'loose', flowchart:{curve:'basis'}});
+function dl(btn){
+  const svg = btn.parentElement.querySelector('svg');
+  if(!svg){alert('Diagram still rendering — wait a second.');return;}
+  const s = new XMLSerializer().serializeToString(svg);
+  const blob = new Blob([s], {type:'image/svg+xml'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = btn.parentElement.querySelector('h2').innerText.split('—')[0].trim().replace(/[^a-z0-9]+/gi,'_') + '.svg';
+  a.click();
+}
+</script>
+</body>
+</html>

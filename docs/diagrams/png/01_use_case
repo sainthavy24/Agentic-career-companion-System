@@ -1,0 +1,59 @@
+digraph usecase {
+	bgcolor=white dpi=180 fontname=Helvetica nodesep=0.25 rankdir=LR ranksep=1.1 splines=true
+	node [fontname=Helvetica fontsize=11]
+	edge [fontname=Helvetica fontsize=9]
+	User [label="Job Seeker
+(User)" fontsize=13 image="" shape=none]
+	subgraph cluster_sys {
+		color="#4f6ef7" fontname="Helvetica bold" fontsize=14 label="PathCompanion AI System" style=rounded
+		UC1 [label="Register / Login" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC2 [label="Manage Profile & Skills" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC3 [label="Discover & Match Jobs" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC4 [label="View Matched /
+Missing Skills" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC5 [label="Analyze Skill Gap" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC5b [label="Extract Skills
+(Model 2)" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC6 [label="Generate Learning Plan" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC7 [label="Mark Skill as Learned" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC8 [label="Upload / Build Resume" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC9 [label="Classify Resume
+(Model 1)" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC10 [label="Attend Voice
+Mock Interview" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC11 [label="Use Panic Control" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC12 [label="Receive Interview
+Feedback" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC13 [label="Plan Career Path" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC14 [label="Take Mock Exam
+& Certificate" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+		UC15 [label="Chat with AI Assistant" color="#4f6ef7" fillcolor="#eef1ff" shape=ellipse style=filled]
+	}
+	User -> UC1
+	User -> UC2
+	User -> UC3
+	User -> UC5
+	User -> UC6
+	User -> UC8
+	User -> UC10
+	User -> UC13
+	User -> UC14
+	User -> UC15
+	UC3 -> UC4 [label="«include»" color="#555555" style=dashed]
+	UC5 -> UC5b [label="«include»" color="#555555" style=dashed]
+	UC8 -> UC9 [label="«include»" color="#555555" style=dashed]
+	UC10 -> UC12 [label="«include»" color="#555555" style=dashed]
+	UC6 -> UC7 [label="«extend»" color="#aa3333" style=dashed]
+	UC10 -> UC11 [label="«extend»" color="#aa3333" style=dashed]
+	JobAPIs [label="External Job APIs
+(Remotive, Adzuna...)" color="#cc8800" fillcolor="#fff4e6" shape=box style="filled,rounded"]
+	Gemini [label="Google Gemini" color="#cc8800" fillcolor="#fff4e6" shape=box style="filled,rounded"]
+	Groq [label="Groq Llama / Whisper" color="#cc8800" fillcolor="#fff4e6" shape=box style="filled,rounded"]
+	SB [label="Supabase Auth" color="#cc8800" fillcolor="#fff4e6" shape=box style="filled,rounded"]
+	UC1 -> SB [dir=none]
+	UC3 -> JobAPIs [dir=none]
+	UC6 -> Gemini [dir=none]
+	UC13 -> Gemini [dir=none]
+	UC15 -> Gemini [dir=none]
+	UC10 -> Groq [dir=none]
+}

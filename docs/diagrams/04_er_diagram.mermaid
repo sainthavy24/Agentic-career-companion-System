@@ -1,0 +1,126 @@
+%% ER Diagram — PathCompanion AI (Chapter 4: Design)
+%% Generated from db/schema.sql — 13 tables + agent_events bus, RLS on all
+erDiagram
+    AUTH_USERS ||--|| PROFILES : "1:1"
+    AUTH_USERS ||--o{ SKILLS : has
+    AUTH_USERS ||--o{ MATCHES : has
+    AUTH_USERS ||--o{ GAP_ANALYSES : has
+    AUTH_USERS ||--o{ LEARNING_PLANS : has
+    AUTH_USERS ||--o{ RESUMES : has
+    AUTH_USERS ||--o{ INTERVIEW_SESSIONS : has
+    AUTH_USERS ||--o{ CAREER_PATHS : has
+    AUTH_USERS ||--o{ AGENT_EVENTS : emits
+    AUTH_USERS ||--o{ EXAM_RESULTS : has
+    JOB_POSTINGS ||--o{ MATCHES : "matched in"
+    JOB_POSTINGS ||--o{ GAP_ANALYSES : "analyzed for"
+    JOB_POSTINGS ||--o{ RESUMES : "tailored for"
+    JOB_POSTINGS ||--o{ INTERVIEW_SESSIONS : "practiced for"
+    GAP_ANALYSES ||--o{ LEARNING_PLANS : generates
+    INTERVIEW_SESSIONS ||--o{ INTERVIEW_TURNS : contains
+    CAREER_PATHS ||--o{ MILESTONES : contains
+
+    PROFILES {
+        uuid id PK "FK auth.users"
+        text full_name
+        text email
+        text target_role
+        text location
+        jsonb prefs
+    }
+    SKILLS {
+        uuid id PK
+        uuid user_id FK
+        text name
+        int proficiency "0-100"
+        text source "manual|learning|resume"
+    }
+    JOB_POSTINGS {
+        uuid id PK
+        text source
+        text title
+        text company
+        boolean remote
+        text description
+        vector_768 embedding "HNSW index"
+    }
+    MATCHES {
+        uuid id PK
+        uuid user_id FK
+        uuid job_id FK
+        numeric score
+        text_arr matched_skills
+        text_arr missing_skills
+    }
+    GAP_ANALYSES {
+        uuid id PK
+        uuid user_id FK
+        uuid job_id FK
+        jsonb present_skills
+        jsonb missing_skills "skill+importance"
+        text status "fresh|stale"
+    }
+    LEARNING_PLANS {
+        uuid id PK
+        uuid user_id FK
+        uuid gap_id FK
+        text skill_name
+        jsonb resources
+        int progress "0-100"
+    }
+    RESUMES {
+        uuid id PK
+        uuid user_id FK
+        uuid job_id FK
+        text type "master|tailored"
+        text category "Model 1 prediction"
+        jsonb content
+        int ats_score
+        vector_768 embedding "HNSW index"
+        boolean needs_refresh "set by cascade"
+    }
+    INTERVIEW_SESSIONS {
+        uuid id PK
+        uuid user_id FK
+        uuid job_id FK
+        int anxiety_pre "0-10"
+        int anxiety_post "0-10"
+        numeric score
+    }
+    INTERVIEW_TURNS {
+        uuid id PK
+        uuid user_id FK
+        uuid session_id FK
+        int idx
+        text question
+        text answer_transcript
+        jsonb feedback
+    }
+    CAREER_PATHS {
+        uuid id PK
+        uuid user_id FK
+        text goal
+        jsonb stages
+    }
+    MILESTONES {
+        uuid id PK
+        uuid user_id FK
+        uuid path_id FK
+        text stage_name
+        text_arr required_skills
+        int duration_months
+    }
+    AGENT_EVENTS {
+        uuid id PK
+        uuid user_id FK
+        text type "skill_learned|resume_updated"
+        jsonb payload
+        boolean processed
+    }
+    EXAM_RESULTS {
+        uuid id PK
+        uuid user_id FK
+        text subject
+        numeric score
+        int total_questions
+        int correct_answers
+    }

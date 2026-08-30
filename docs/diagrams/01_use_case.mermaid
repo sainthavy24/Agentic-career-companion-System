@@ -1,0 +1,40 @@
+%% Use Case Diagram — PathCompanion AI (Chapter 3: Requirements)
+%% Mermaid approximation; redraw in draw.io with proper UML ovals if needed
+flowchart LR
+    User(["👤 Job Seeker / User"])
+
+    subgraph System["PathCompanion AI System"]
+        UC1(["Register / Login"])
+        UC2(["Manage Profile & Skills"])
+        UC3(["Discover & Match Jobs"])
+        UC4(["View Matched / Missing Skills"])
+        UC5(["Analyze Skill Gap"])
+        UC6(["Generate Learning Plan"])
+        UC7(["Mark Skill as Learned"])
+        UC8(["Upload / Build Resume"])
+        UC9(["Classify Resume (Model 1)"])
+        UC10(["Attend Voice Mock Interview"])
+        UC11(["Use Panic Control"])
+        UC12(["Receive Interview Feedback"])
+        UC13(["Plan Career Path"])
+        UC14(["Take Mock Exam & Get Certificate"])
+        UC15(["Chat with AI Assistant"])
+    end
+
+    JobAPIs(["🌐 External Job APIs<br/>(Remotive, Adzuna...)"])
+    Gemini(["🤖 Google Gemini"])
+    Groq(["⚡ Groq (Llama / Whisper)"])
+    Supabase(["🗄️ Supabase Auth"])
+
+    User --> UC1 & UC2 & UC3 & UC5 & UC6 & UC8 & UC10 & UC13 & UC14 & UC15
+    UC3 -.->|include| UC4
+    UC5 -.->|include| UC9x(["Extract Skills (Model 2)"])
+    UC6 -.->|extend| UC7
+    UC8 -.->|include| UC9
+    UC10 -.->|extend| UC11
+    UC10 -.->|include| UC12
+
+    UC1 --- Supabase
+    UC3 --- JobAPIs
+    UC6 & UC13 & UC15 --- Gemini
+    UC10 --- Groq

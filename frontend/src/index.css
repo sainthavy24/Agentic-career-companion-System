@@ -702,3 +702,166 @@ a{text-decoration:none;color:inherit}
   }
 }
 
+/* ===== Mockup Exam ===== */
+.exam-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+.exam-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 24px;
+}
+.exam-options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 18px;
+}
+.exam-option-btn {
+  width: 100%;
+  text-align: left;
+  padding: 14px 18px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  font-size: 14px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: inherit;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.exam-option-btn:hover {
+  background: var(--primary-soft);
+  border-color: #c7d2fe;
+  color: var(--primary);
+}
+.exam-option-btn.selected {
+  background: var(--primary);
+  color: #fff;
+  border-color: var(--primary);
+  font-weight: 600;
+}
+.exam-option-badge {
+  width: 24px;
+  height: 24px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.05);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  flex-shrink: 0;
+}
+.exam-option-btn.selected .exam-option-badge {
+  background: rgba(255, 255, 255, 0.2);
+}
+.exam-nav-btns {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+.exam-result-header {
+  text-align: center;
+  padding: 20px 0;
+}
+.exam-score-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  background: var(--primary-soft);
+  color: var(--primary);
+  font-size: 32px;
+  font-weight: 800;
+  margin: 16px 0;
+  border: 4px solid #c7d2fe;
+}
+.exam-review-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 16px 20px;
+  margin-top: 14px;
+}
+.exam-review-card.correct {
+  border-left: 4px solid var(--ok);
+  background: #f0fdf4;
+  border-color: #bbf7d0;
+}
+.exam-review-card.incorrect {
+  border-left: 4px solid var(--bad);
+  background: #fef2f2;
+  border-color: #fecaca;
+}
+.exam-explanation {
+  margin-top: 10px;
+  padding: 10px 14px;
+  background: var(--surface-2);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.45;
+}
+
+
+/* ===== Resume Builder ===== */
+.input{padding:9px 11px;border:1px solid var(--border);border-radius:9px;font-size:14px;font-family:inherit;color:var(--text);background:var(--surface)}
+.input:focus{outline:none;border-color:#c7d2fe}
+
+.resume-sheet{background:#fff;color:#111827;border:1px solid var(--border);border-radius:6px;box-shadow:var(--shadow);padding:44px 48px;max-width:800px;margin:0 auto;line-height:1.5;font-size:13.5px}
+.resume-sheet h1{margin:0;font-size:26px}
+.resume-sheet h2{font-size:13px;text-transform:uppercase;letter-spacing:.08em;margin:22px 0 8px;padding-bottom:4px;border-bottom:1.5px solid #111827}
+.resume-sheet p{margin:0}
+.resume-sheet section{margin-top:4px}
+.rs-header{text-align:center;margin-bottom:6px}
+.rs-title{font-size:14px;font-weight:600;color:#374151;margin-top:3px}
+.rs-contact{display:flex;justify-content:center;flex-wrap:wrap;gap:4px 14px;font-size:12px;color:#4b5563;margin-top:7px}
+.rs-skills{display:flex;flex-wrap:wrap;gap:6px}
+.rs-skills span{border:1px solid #d1d5db;border-radius:999px;padding:2px 10px;font-size:12px}
+.rs-item{margin-bottom:12px}
+.rs-item-head{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+.rs-item-head b{font-size:14px}
+.rs-period{font-size:12px;color:#6b7280;white-space:nowrap}
+.rs-company{font-size:13px;color:#374151;font-style:italic}
+.rs-item ul{margin:5px 0 0;padding-left:18px}
+.rs-item li{margin-bottom:3px}
+
+/* Template: Classic ATS (serif, black & white) */
+.tpl-classic{font-family:Georgia,'Times New Roman',serif}
+.tpl-classic h1{font-family:Georgia,serif}
+
+/* Template: Modern (sans, indigo accents) */
+.tpl-modern{font-family:'Helvetica Neue',Arial,sans-serif}
+.tpl-modern h1{color:#4f46e5}
+.tpl-modern h2{border-bottom-color:#4f46e5;color:#4f46e5}
+.tpl-modern .rs-title{color:#4f46e5}
+.tpl-modern .rs-skills span{background:#eef2ff;border-color:#c7d2fe;color:#4338ca}
+.tpl-modern .rs-header{text-align:left}
+.tpl-modern .rs-contact{justify-content:flex-start}
+
+/* Template: Compact (tighter, smaller) */
+.tpl-compact{font-family:'Helvetica Neue',Arial,sans-serif;font-size:12px;padding:32px 36px;line-height:1.4}
+.tpl-compact h1{font-size:21px}
+.tpl-compact h2{margin:14px 0 6px;font-size:11.5px}
+.tpl-compact .rs-item{margin-bottom:8px}
+.tpl-compact .rs-skills span{padding:1px 8px;font-size:11px}
+
+/* Print: only the resume sheet, clean A4 */
+@media print{
+  body{background:#fff}
+  body *{visibility:hidden}
+  .resume-sheet,.resume-sheet *{visibility:visible}
+  .resume-sheet{position:absolute;left:0;top:0;width:100%;max-width:none;margin:0;border:none;box-shadow:none;border-radius:0;padding:24px 34px}
+  .no-print{display:none !important}
+  @page{size:A4;margin:12mm}
+}

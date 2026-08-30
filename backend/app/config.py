@@ -21,6 +21,13 @@ class Settings:
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
     groq_api_key: str = os.getenv("GROQ_API_KEY", "")
     cors_origins: list = os.getenv("CORS_ORIGINS", "http://localhost:5173").split(",")
+    
+    # ---- SMTP / Email Settings ----
+    smtp_host: str = os.getenv("SMTP_HOST", "")
+    smtp_port: int = int(os.getenv("SMTP_PORT", "587"))
+    smtp_username: str = os.getenv("SMTP_USERNAME", "")
+    smtp_password: str = os.getenv("SMTP_PASSWORD", "")
+    smtp_sender: str = os.getenv("SMTP_SENDER", "noreply@pathcompanion.ai")
 
 
 settings = Settings()

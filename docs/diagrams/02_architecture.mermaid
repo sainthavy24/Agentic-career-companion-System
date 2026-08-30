@@ -1,0 +1,47 @@
+%% System Architecture Diagram — PathCompanion AI (Chapter 4: Design)
+%% 3-tier + ML inference module + external AI services
+flowchart TB
+    subgraph Client["🖥️ Presentation Tier — React 18 + Vite"]
+        Pages["Pages: Dashboard · Jobs · SkillGap · Learning<br/>Resume · Interview · CareerPath · MockExam · Chatbot · Profile"]
+        Store["State (store.js) + Supabase JS client (auth)"]
+    end
+
+    subgraph Backend["⚙️ Application Tier — FastAPI (Python 3.11, async)"]
+        Routers["Routers (/api/v1)<br/>jobs · skillgap · learning · resume<br/>interview · career · exam · chat · assistant"]
+        subgraph Services["Service Layer"]
+            JobsSvc["jobs.py<br/>fetch + upsert"]
+            MatchSvc["matching.py<br/>hybrid score"]
+            EmbedSvc["embeddings.py<br/>768-d vectors"]
+            IntSvc["interview.py<br/>Q / feedback / coach"]
+            LearnSvc["learning.py + career.py"]
+            LLMSvc["gemini.py · groq_svc.py"]
+            EmailSvc["email_svc.py<br/>certificates"]
+        end
+        subgraph ML["🧠 ML Inference Module (ml_models.py)"]
+            M1["Model 1: Resume Classifier<br/>TF-IDF+LR / DistilBERT (joblib)"]
+            M2["Model 2: Skill Extractor<br/>multi-label (joblib)"]
+        end
+    end
+
+    subgraph Data["🗄️ Data Tier — Supabase (PostgreSQL + pgvector)"]
+        Tables["13 tables · RLS per user<br/>profiles · skills · job_postings · matches<br/>gap_analyses · learning_plans · resumes<br/>interview_sessions/turns · career_paths<br/>milestones · exam_results"]
+        Bus["agent_events<br/>(shared event bus → cascade)"]
+        HNSW["HNSW vector indexes<br/>(jobs, resumes embeddings)"]
+    end
+
+    subgraph Ext["🌐 External Services (free tier)"]
+        JobAPIs["Job APIs: Remotive · Adzuna · Arbeitnow"]
+        GeminiAPI["Google Gemini Flash<br/>generation + JSON + embeddings"]
+        GroqAPI["Groq: Llama 3.3 70B (chat)<br/>Whisper (STT)"]
+        TTS["Edge-TTS / Web Speech<br/>(voice output)"]
+    end
+
+    Client -->|"REST (JSON) + SSE"| Routers
+    Store -->|Auth (JWT)| Data
+    Routers --> Services
+    Routers --> ML
+    Services --> Data
+    JobsSvc --> JobAPIs
+    EmbedSvc & LLMSvc --> GeminiAPI
+    IntSvc --> GroqAPI
+    Client --> TTS

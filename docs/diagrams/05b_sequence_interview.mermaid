@@ -1,0 +1,43 @@
+%% Sequence Diagram 2 — Voice Mock Interview loop (with Panic Control)
+sequenceDiagram
+    autonumber
+    actor U as Candidate
+    participant FE as React Frontend<br/>(Interview page)
+    participant IR as Interview Router<br/>(FastAPI)
+    participant IS as Interview Service
+    participant GQ as Groq<br/>Llama 3.3 70B
+    participant WH as Groq Whisper<br/>(STT)
+    participant TTS as TTS Engine<br/>(voice out)
+    participant DB as Supabase
+
+    U->>FE: Start interview (select job/role)
+    FE->>DB: read skills + job context (shared memory)
+    FE->>IR: POST /interview/question {role, history, skills}
+    IR->>IS: next_question()
+    IS->>GQ: contextual prompt
+    GQ-->>IS: adaptive question
+    IS-->>FE: question text
+    FE->>TTS: speak question
+    TTS-->>U: 🔊 spoken question
+
+    U->>FE: 🎤 spoken answer (recorded)
+    FE->>IR: POST /interview/transcribe (audio)
+    IR->>WH: transcribe()
+    WH-->>IR: transcript
+    IR-->>FE: transcript text
+    FE->>IR: POST /interview/coach {question, answer}
+    IR-->>FE: per-answer feedback
+    Note over FE: loop continues adaptively (< 2 s target latency)
+
+    opt Panic Button pressed
+        U->>FE: 🆘 Panic
+        FE-->>U: pause + breathing exercise + confidence tips
+    end
+
+    U->>FE: End interview
+    FE->>IR: POST /interview/feedback {history}
+    IR->>IS: feedback()
+    IS->>GQ: evaluate full session
+    GQ-->>IS: report
+    IR->>DB: save session + turns + anxiety pre/post
+    IR-->>FE: final feedback report

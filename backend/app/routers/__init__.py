@@ -1,6 +1,6 @@
 """API v1 router. Per-agent routers included here as phases land."""
 from fastapi import APIRouter
-from app.routers import jobs, resume, skillgap, career, learning, interview, chat, assistant
+from app.routers import jobs, resume, skillgap, career, learning, interview, chat, assistant, exam
 
 api_router = APIRouter()
 
@@ -35,3 +35,4 @@ api_router.include_router(learning.router, prefix="/learning", tags=["learning"]
 api_router.include_router(interview.router, prefix="/interview", tags=["interview"])
 api_router.include_router(chat.router, prefix="/chat", tags=["chat"])
 api_router.include_router(assistant.router, prefix="/assistant", tags=["assistant"])
+api_router.include_router(exam.router, prefix="/exam", tags=["exam"])

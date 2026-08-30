@@ -1,0 +1,31 @@
+--- slide1.xml ---
+TITLE OF THE PROJECT 
+  (Times New Roman,38 ft size)
+Development Project-CIS6035 /Dissertation Project CIS 6000
+BSc. Software Engineering / BSc BIS -(Batch Number ) 
+Student: K. Name (JF/----------)
+Supervisor: _____________
+ICBT Campus, Jaffna
+Date
+ (Times New Roman,18 ft size)
+--- slide2.xml ---
+Table of Contents
+Introduction      (max 1 slide)
+Problem statement   (max  1 slide)
+Objectives (1 slide)
+Literature Review  (max 2 slides)
+Proposed solution  (1 slide)
+Functionalities & Non-functionalities of the system  (max 2 slides)
+Methodology (max 2 slides)
+Technology Stack (max 4 slides)
+Limitations for the project  (1 slide)
+Lesson Learned   (1 slide)
+Future recommendation  (1 slide)
+References (max 2 slides)
+--- slide3.xml ---
+Introduction
+This project addresses this challenge by developing a comprehensive Java-based solution that automates the management. (
+Sample
+) 
+! Sample content 
+Please make sure to follow the font size and the font style as mentioned in the slide for the all table of contents.

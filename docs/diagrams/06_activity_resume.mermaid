@@ -1,0 +1,22 @@
+%% Activity Diagram — Resume Architect flow (upload → classify → tailor → export)
+flowchart TD
+    Start([● Start]) --> Choice{Resume source?}
+    Choice -->|Upload PDF| Upload[/Upload existing resume PDF/]
+    Choice -->|Build in-app| Build[Fill profile-based resume builder]
+    Upload --> Extract[Extract text from PDF]
+    Extract --> Valid{Text extracted OK?}
+    Valid -->|No| Err[Show error: unreadable file] --> Choice
+    Valid -->|Yes| M1[["🧠 Model 1: classify resume<br/>→ category + top-3 confidence"]]
+    Build --> M1
+    M1 --> Save[(Save master resume<br/>+ predicted category)]
+    Save --> Align{Category matches<br/>target role?}
+    Align -->|No| Warn[Show alignment warning<br/>+ suggest skill gap analysis]
+    Align -->|Yes| Pick[User selects target job posting]
+    Warn --> Pick
+    Pick --> Tailor[Generate tailored version<br/>ATS keyword optimization - Gemini]
+    Tailor --> ATS[Compute ATS score]
+    ATS --> Review{User approves?}
+    Review -->|Edit| Tailor
+    Review -->|Yes| Export[/Export as PDF/]
+    Export --> SaveT[(Save tailored resume<br/>linked to job_id)]
+    SaveT --> End([◉ End])

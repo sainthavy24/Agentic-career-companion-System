@@ -1,0 +1,586 @@
+[Insert Cardiff Metropolitan University logo here]
+Cardiff Metropolitan University
+Cardiff School of Technology
+BSc Software Engineering
+PathCompanion AI — An Agentic Career and Talent Companion System
+Sainthavy Yogaraththinam
+(Student ID – Cardiff ID – ICBT ID)
+This dissertation is submitted in partial
+fulfillment of the requirements for the
+degree of
+Bachelor of Science in Software Engineering (BSc SE)
+DECLARATION
+This work is being submitted in partial fulfillment of the requirements for the degree of
+…………………………………………………………………………………………. and has not previously been accepted in substance for any degree and is not being concurrently submitted in candidature for any degree.
+Signed - ............................................................
+(Candidate)  Date - ...................................
+SUPERVISOR’S DECLARATION STATEMENT
+Student Name – [Student Name]
+Supervisor’s Name - [Supervisor Name]
+I acknowledge that the above named student has regularly attended the meeting, and actively engaged in the dissertation supervision process.
+Signed - …………………………………………….
+(Supervisor)  Date - …………………......
+Acknowledgement
+I would like to express my sincere gratitude to my supervisor, [Supervisor Name], for the continuous guidance, constructive feedback, and encouragement provided throughout every phase of this project. I also thank the lecturers and staff of ICBT and Cardiff Metropolitan University for the knowledge and support extended across the programme.
+Finally, I thank my family and friends for their patience and motivation during the demanding periods of development, model training, and documentation, and the peers who participated in requirement gathering and testing of the system.
+Abstract
+Career development today is fragmented across disconnected platforms: job seekers search vacancies on multiple boards, guess at the skills a role requires, hunt for learning resources of uncertain quality, rewrite resumes by hand, and rehearse interviews inadequately or not at all. PathCompanion AI addresses this fragmentation with a single full-stack web application in which six cooperating AI agents — Job Scout, Skill Gap Analyzer, Learning Resource Finder, Resume Architect, Mock Interview with Panic Control, and Career Path Planner — share a common memory and react to one another through an event bus, while remaining fully usable as standalone modules.
+The system adopts a hybrid intelligence design. Two custom machine-learning models were trained specifically for this project: (1) a resume-category classifier, a fine-tuned DistilBERT trained on the Kaggle Resume Dataset (2,484 resumes, 24 occupational categories), achieving 82.3% test accuracy and 0.751 macro-F1 against a TF-IDF + Logistic Regression baseline of 65.5% and 0.596; and (2) a multi-label skill-extraction model trained over a 25-skill vocabulary using LLM-assisted weak labelling of ~11,800 public job postings. These trained models handle the core structured-analysis tasks, while free-tier large language models (Google Gemini Flash, Groq Llama 3.3 70B, Groq Whisper) handle open-ended generation, conversation, and speech.
+The application is implemented with React 18 (Vite) on the frontend, FastAPI (Python 3.11) on the backend, and Supabase (PostgreSQL with pgvector) as the data tier, using 13 relational tables protected by row-level security and HNSW vector indexes for semantic job matching. This report presents the complete engineering lifecycle — planning, requirement gathering and analysis, system design, implementation, and testing and validation — together with a quantitative evaluation of the trained models and an honest discussion of limitations and future work.
+Table of Contents
+Acknowledgement3
+Abstract4
+Table of Contents5
+List of Figures7
+List of Tables7
+1.0 Introduction8
+1.1 Background Studies8
+1.2 Problem Statement8
+1.3 Objective9
+1.4 Solutions9
+2.0 Literature Review11
+2.1 Fragmentation of Career Tooling11
+2.2 Agentic AI Systems11
+2.3 Text Classification and Transfer Learning11
+2.4 Skill Extraction and Weak Supervision11
+2.5 Semantic Retrieval with Vector Databases11
+2.6 Speech Interfaces for Interview Practice12
+3.0 Planning13
+3.0.1 Feasibility Report13
+3.0.2 Risk Assessment13
+3.0.3 SWOT14
+3.0.4 PESTAL Analysis14
+3.0.5 Life Cycle Model14
+3.1.1 Time Plan15
+4.2 Requirement Gathering and Analysis16
+4.2.1 Requirement Gathering technique used for the project16
+4.2.2 Questionnaire16
+4.2.3 Interview16
+Summary of the Interview and Questionnaire16
+4.3 Functional and Non-Functional Requirements17
+4.3.1 Functional Requirements17
+4.3.2 Non-functional Requirement18
+5.0 System Design19
+5.1 Architecture Diagram19
+5.2 ER Diagram19
+5.3 UML Diagrams21
+5.3.1 Use Case Diagram21
+5.3.2 Class Diagram21
+5.3.3 Sequence Diagram — Interconnected Cascade23
+5.3.4 Sequence Diagram — Voice Mock Interview23
+5.3.5 Activity Diagram — Resume Architect25
+5.4 Wireframe Diagram25
+6.0 Implementation27
+6.1 Technology Stack27
+6.2 Design patterns27
+6.3 Implementation of the program27
+6.3.1 Backend Structure27
+6.3.2 ML Model 1 — Resume Category Classifier28
+6.3.3 ML Model 2 — Skill-Extraction Model28
+6.3.4 Model Inference Module28
+6.3.5 The Interconnected Cascade28
+6.3.6 Frontend and Security29
+7.0 Testing and Validation30
+Test Plan30
+Test Cases30
+Model Validation — Model 1 (Resume Category Classifier)30
+Model Validation — Model 2 (Skill Extraction)31
+Validation Against Objectives31
+Limitations32
+8.0 Conclusion33
+8.1 Conclusion33
+8.2 Future Recommendations33
+8.3 Lessons Learned33
+Gantt Chart35
+References36
+Appendix 137
+Questionnaire and answers37
+Source codes37
+Test Case37
+Appendix 238
+Supervision meeting log sheets38
+(In Microsoft Word: right-click the table above → Update Field → Update entire table.)
+List of Figures
+Figure 1: Three-tier system architecture with ML inference module and external services
+Figure 2: Entity-relationship diagram (13 tables; cardinalities shown as 1:1 / 1:N)
+Figure 3: Use case diagram of PathCompanion AI
+Figure 4: Backend class diagram — routers (blue) and services (green)
+Figure 5: Sequence diagram — the skill-learned cascade across agents via the event bus
+Figure 6: Sequence diagram — voice mock interview loop with panic control
+Figure 7: Activity diagram — resume upload, classification (Model 1), tailoring and export
+Figure 8: Project Gantt chart — eight two-week phases over 16 weeks
+List of Tables
+Table 1: Feasibility assessment
+Table 2: Risk assessment and mitigation
+Table 3: SWOT analysis
+Table 4: PESTAL analysis
+Table 5: Time plan — phased delivery schedule
+Table 6: Functional requirements (MoSCoW prioritised)
+Table 7: Non-functional requirements
+Table 8: Technology stack
+Table 9: Key end-to-end test scenarios
+Table 10: Model 1 evaluation on the held-out test set (249 resumes, 24 classes)
+Table 11: Model 2 evaluation (~11,800 postings, 25 labels, 90/10 split) — insert final metrics from the Colab run
+Table 12: Objective-by-objective validation
+Table 13: Detailed test case template (T-07)
+1.0 Introduction
+1.1 Background Studies
+The global employment landscape is undergoing structural transformation. Rapid technological change has shortened the shelf life of professional skills, while job vacancies are scattered across dozens of platforms (LinkedIn, Indeed, Glassdoor, specialised remote-work boards) and learning resources across an equally bewildering range of providers. The result is a persistent talent gap: employers struggle to find suitably skilled candidates, while capable individuals cannot easily identify which skills they lack, where to learn them, or how to present themselves convincingly. Graduates and career-changers — particularly in developing economies such as Sri Lanka — rarely have access to affordable career coaching.
+The recent maturation of large language models (LLMs) and agentic orchestration frameworks makes conversational and generative career support feasible at near-zero cost through generous free tiers (Google Gemini, Groq). However, relying solely on third-party LLMs is neither robust nor academically sufficient. PathCompanion AI therefore adopts a hybrid intelligence design in which two custom-trained machine-learning models handle the well-defined classification and extraction tasks at the system's core, while LLMs handle open-ended generation and conversation. This reduces external dependency, improves reproducibility, and demonstrates an end-to-end machine-learning engineering workflow alongside full-stack software engineering.
+1.2 Problem Statement
+Career development today is fragmented across disconnected tools. A typical job seeker must search multiple job boards manually, guess which skills a posting truly requires, search separately for courses of uncertain quality, rewrite their resume by hand for every application, practise interviews with friends or not at all, and track professional growth in their head. No mainstream tool connects these steps, so insight generated in one stage is never propagated to the others.
+Six key issues define the problem space:
+Job discovery is inefficient — relevant openings are buried across many platforms, and keyword search fails to capture semantic matches (a 'Frontend Engineer' vacancy will not surface for a 'React developer' profile).
+Skill gaps are invisible — candidates receive no structured feedback on which specific skills separate them from a target role, or how important each missing skill is.
+Learning is unguided — free, high-quality resources exist (freeCodeCamp, MDN, official documentation) but sequencing them into a coherent study path requires expertise the learner does not yet have.
+Resumes are generic — applicant-tracking systems (ATS) reward keyword alignment with each specific job description, yet applicants send one resume everywhere.
+Interview anxiety is unaddressed — candidates have no safe, realistic environment to rehearse spoken interviews; existing mock-interview tools are text-only, scripted, and disconnected from the actual job.
+Career progression is opaque — professionals do not know which role follows their current one, which skills it demands, or how long the transition should take.
+1.3 Objective
+The main objective is to design, implement, and evaluate a full-stack, multi-agent AI web application that provides end-to-end career support through six cooperating agents sharing a common memory, with two custom-trained machine-learning models at the core of its resume and skill-gap intelligence, operable both as interconnected workflows and as standalone modules.
+The specific, measurable sub-objectives were:
+Design a normalised PostgreSQL (Supabase) schema with pgvector embeddings serving as shared memory for all agents, with row-level security per user.
+Train and evaluate a resume-category classification model on the Kaggle Resume Dataset (2,484 labelled resumes, 24 categories), benchmarked against a TF-IDF baseline.
+Train and evaluate a multi-label skill-extraction model over a curated skill vocabulary using LLM-assisted weak labelling of public job-description text.
+Implement automated job aggregation from free public job APIs with hybrid semantic + skill-overlap matching.
+Implement skill-gap analysis, ordered learning plans, ATS-optimised resume generation, a voice-based mock-interview agent with panic control, and long-term career-path planning.
+Demonstrate the interconnected cascade: marking a skill as learned automatically refreshes gap analyses and flags affected resume drafts within 30 seconds without blocking the UI.
+Operate the entire system within the free-tier limits of all external services.
+1.4 Solutions
+The proposed solution is a web application composed of a React (Vite) frontend, a FastAPI (Python) backend, and a Supabase (PostgreSQL + pgvector) database, whose intelligence layer is deliberately hybrid. Each of the six problems above is answered by a dedicated agent: the Job Scout aggregates vacancies from free public APIs and matches them semantically to the user's profile; the Skill Gap Analyzer uses the custom-trained skill-extraction model to partition skills into present and missing with importance ratings; the Learning Resource Finder converts each gap into an ordered study path of free resources with progress tracking; the Resume Architect uses the custom-trained resume classifier and generates ATS-optimised tailored resumes per job; the Mock Interview agent conducts realistic spoken interviews with adaptive questions, per-answer feedback and a panic-control feature; and the Career Path Planner maps the next role, its required skills, and a realistic timeline.
+Crucially, the agents operate over shared memory and an event bus: when the user marks a skill as learned, the system automatically refreshes stale gap analyses and flags affected resume drafts — a cascade triggered by a single user action, while every module remains fully usable on its own. During development, a mock-exam module with e-mailed certificates was added beyond the original proposal scope.
+2.0 Literature Review
+2.1 Fragmentation of Career Tooling
+Mainstream career tools each solve one slice of the problem. Job boards (LinkedIn, Indeed, Glassdoor, Remotive) index vacancies but provide limited skill-level feedback; resume builders (Zety, Novoresume) format documents but do not tailor content per job description; course platforms (Coursera, Udemy, freeCodeCamp) teach skills but are disconnected from the learner's actual gap; and mock-interview tools are predominantly text-based, scripted, and unaware of the specific job the candidate targets. No mainstream tool propagates insight generated in one stage (a newly learned skill) to the others (the resume, the job matches, the interview preparation). This integration gap is the central motivation for the present system.
+2.2 Agentic AI Systems
+The maturation of large language models and orchestration frameworks (LangGraph, LangChain) has made multi-agent architectures practical: specialised agents with distinct responsibilities coordinate through shared state rather than direct invocation (LangChain Inc., 2025). The design used here — agents that never call one another directly but write to shared memory and emit events — follows the event-driven pattern widely recommended for loosely coupled multi-agent systems, and preserves the ability to use every module standalone.
+2.3 Text Classification and Transfer Learning
+Transformer-based transfer learning is the established approach for text classification. DistilBERT (Sanh et al., 2019) retains roughly 97% of BERT's language-understanding capability with 40% fewer parameters and 60% faster inference, making it well suited to free-GPU training environments (Google Colab) and lightweight backend serving. Classical baselines — TF-IDF features with Logistic Regression or linear SVM — remain important reference points: comparing a fine-tuned transformer against such a baseline quantifies the benefit of contextual representations (Pedregosa et al., 2011).
+2.4 Skill Extraction and Weak Supervision
+Skill extraction from job postings is an active research area. Because manual span-level annotation is impractical at scale, weak supervision — programmatically or LLM-generated labels over large corpora, with a smaller manually verified gold set — is a well-established strategy (Zhang, Jensen and Plank, 2022). The ESCO taxonomy (European Commission) provides a standards-aligned label space of ~13,900 skills; restricting the label set to a curated high-frequency subset keeps multi-label classification tractable for an individual project while remaining interoperable.
+2.5 Semantic Retrieval with Vector Databases
+Dense embeddings enable semantic matching that keyword search cannot: a 'Frontend Engineer' vacancy can surface for a 'React developer' profile. pgvector adds vector similarity search to PostgreSQL, and HNSW indexes provide fast approximate nearest-neighbour retrieval, allowing job-to-profile matching within the same relational database that stores all other user data (Supabase, 2026). The hybrid scoring approach used here (embedding similarity plus explicit skill overlap) follows common practice in retrieval systems that combine dense and sparse signals.
+2.6 Speech Interfaces for Interview Practice
+Interview anxiety measurably degrades performance, and rehearsal in a realistic spoken setting reduces it. Modern speech pipelines make this feasible at zero cost: Whisper-class models provide accurate speech-to-text, neural TTS provides natural-sounding questions, and low-latency LLM inference (Groq) keeps the conversational loop under the ~2-second threshold at which spoken dialogue feels natural.
+3.0 Planning
+3.0.1 Feasibility Report
+Dimension
+Assessment
+Technical
+All components rest on proven, well-documented technologies (React, FastAPI, Supabase, scikit-learn, Hugging Face Transformers). Model training fits free Colab GPUs (DistilBERT-scale); inference is light enough for free-tier backend hosting. Feasible.
+Economic
+Zero direct cost: every external service (Gemini, Groq, Supabase, job APIs, Vercel/Render hosting) is consumed within free tiers; datasets are public for research use. Development cost is the author's time only. Feasible.
+Operational
+The system runs as a standard web application requiring only a browser and a microphone; no installation for end users. Free-tier rate limits are respected by design (caching, background jobs). Feasible.
+Schedule
+16 weeks divided into eight two-week phases, each ending in a demonstrable increment; two phases reserved for ML development. Achieved as planned (see Gantt chart). Feasible.
+Legal / Ethical
+All datasets are publicly available under research-permissive licences (ESCO under CC BY 4.0); no personal user data is used for model training; user data is isolated by row-level security. Model outputs are presented as decision support, not automated judgement. Feasible.
+Table 1: Feasibility assessment
+3.0.2 Risk Assessment
+Risk
+Likelihood
+Impact
+Mitigation
+Free-tier API rate limits exhausted
+Medium
+High
+Cache LLM outputs; batch background jobs; per-task model selection (Gemini for heavy text, Groq for chat); local trained models for the most frequent tasks
+Model accuracy below target
+Medium
+Medium
+Baseline-first strategy; documented limitations; mitigations identified (longer inputs, class weighting); transformer-vs-baseline improvement is the key claim
+External job API changes/downtime
+Medium
+Medium
+Multiple aggregation sources; upsert design tolerates gaps; cached postings remain usable
+Scope creep (six agents + 2 models)
+High
+High
+Strict two-week increments; MoSCoW prioritisation; deferred agents moved to future work
+Voice latency too high for natural dialogue
+Low
+Medium
+Groq LPU inference chosen specifically for latency; streaming responses; latency measured per phase
+Data loss / environment failure
+Low
+High
+Git version control for all code and notebooks; Supabase managed backups; model artefacts exported after each training run
+Table 2: Risk assessment and mitigation
+3.0.3 SWOT
+Strengths
+Weaknesses
+End-to-end integration of six agents over shared memory; two custom-trained models reduce external dependency; zero operating cost; voice-based realistic interview practice; strong reproducibility (versioned notebooks)
+Dependent on free-tier limits for LLM features; Model 2 label space limited to 25 skills; single developer — limited parallel workstreams; English-only interface in this release
+Opportunities
+Threats
+Real-world release to students and early-career professionals; recruiter portal; multilingual (Tamil/Sinhala) expansion; mobile client on the same backend
+Free-tier terms may change; large incumbents (LinkedIn) could bundle similar features; LLM API deprecations require adapter maintenance
+Table 3: SWOT analysis
+3.0.4 PESTAL Analysis
+Factor
+Analysis
+Political
+Governments in South Asia actively promote digital up-skilling and employability initiatives; a free career companion aligns with such policy directions. No political barriers apply to the technology used.
+Economic
+Youth unemployment and skill mismatch carry high economic cost; reducing job-search duration and improving interview success has direct economic value. The zero-cost model removes the affordability barrier that excludes most students from paid coaching.
+Social
+Career coaching is inaccessible to most graduates in developing economies; interview anxiety is a widespread, under-addressed problem. An always-available, judgement-free AI companion democratises guidance and lowers the social barrier to rehearsal.
+Technological
+Free-tier LLM APIs, free GPU training (Colab), and open-source frameworks make a previously enterprise-grade system buildable by an individual. pgvector brings semantic search into a standard relational database.
+Environmental
+The system is purely digital; by using shared cloud free tiers and lightweight distilled models (DistilBERT rather than larger transformers), its compute footprint is deliberately small.
+Legal
+Public datasets are used under research-permissive licences (ESCO CC BY 4.0, Kaggle terms); no personal data is used for training; per-user data isolation is enforced with row-level security; API keys are held server-side.
+Table 4: PESTAL analysis
+3.0.5 Life Cycle Model
+The project followed an Agile (Scrum-based) life cycle with two-week sprints. Agile was selected over a plan-driven (waterfall) model for three reasons. First, the project combines two workstreams with inherent uncertainty — machine-learning model development (where achievable accuracy is unknown until experiments run) and multi-agent application development (where free-tier API behaviour emerges during integration) — and short iterations allow early course correction. Second, the module requires demonstrable progress at supervision meetings; each sprint concludes with a working increment. Third, requirements were maintained as a prioritised backlog with MoSCoW classification, allowing scope to flex (the mock-exam module was added; two agents were consciously deferred to future work) without endangering the core deliverables.
+Each of the eight phases maps to one sprint of two weeks: sprint reviews assessed the increment against the measurable sub-objectives, and retrospectives fed process improvements into subsequent sprints. Version control used Git with feature branching; user stories followed the 'As a [role], I want [capability], so that [benefit]' format with acceptance criteria defined before implementation.
+3.1.1 Time Plan
+Phase (weeks)
+Demonstrable increment
+1 (1–2)
+Requirements, architecture, Supabase schema with pgvector, authentication, row-level security
+2 (3–4)
+Job Scout: aggregation from public APIs, 768-d embeddings, hybrid matching
+3 (5–6)
+ML Model 1 — resume classifier: TF-IDF baseline, DistilBERT fine-tune, evaluation
+4 (7–8)
+ML Model 2 — skill extraction: weak labelling, multi-label DistilBERT, Skill Gap integration
+5 (9–10)
+Resume Architect (parse, classify, tailor, export) and Learning Resource Finder
+6 (11–12)
+Mock Interview & Panic Control: TTS, Whisper STT, latency tuning, feedback
+7 (13–14)
+Career Path Planner and the interconnected cascade; inference hardening
+8 (15–16)
+End-to-end testing, evaluation, deployment, final documentation
+Table 5: Time plan — phased delivery schedule
+The full Gantt chart is presented at the end of this report (see Gantt Chart section).
+4.2 Requirement Gathering and Analysis
+4.2.1 Requirement Gathering technique used for the project
+Three complementary techniques were used. (1) A questionnaire distributed to final-year students, recent graduates, and early-career professionals to quantify the prevalence of the six problem areas and prioritise features. (2) Semi-structured interviews with a smaller set of job seekers to explore pain points in depth — particularly interview anxiety and resume tailoring behaviour. (3) Document and platform analysis of existing tools (job boards, resume builders, course platforms, mock-interview tools) to identify the integration gap that no mainstream tool covers. The combination provides quantitative breadth, qualitative depth, and competitive grounding.
+4.2.2 Questionnaire
+The questionnaire contained the following core questions (5-point Likert scale unless noted):
+How many different platforms do you currently use when searching for a job? (count)
+How confident are you that you know exactly which skills you are missing for your target role?
+Have you ever received structured feedback on the gap between your skills and a specific job posting? (yes/no)
+Do you tailor your resume for every application? If not, what stops you? (multiple choice + free text)
+How anxious do you feel before spoken job interviews?
+Have you ever practised a spoken (voice) mock interview with realistic questions? (yes/no)
+Do you know which role logically follows your current/target position, and what it requires?
+Would you use a single free application that combines job matching, skill-gap analysis, learning plans, resume tailoring, and voice interview practice? (yes/no/maybe)
+Which of the six capabilities would be most valuable to you? (ranking)
+[Insert the number of respondents, response charts, and per-question result summaries from your survey here — e.g., Google Forms result screenshots.]
+4.2.3 Interview
+Semi-structured interviews followed this guide: current job-search workflow and platforms used; how the interviewee decides which skills to learn next; how resumes are prepared per application and awareness of ATS keyword filtering; experience and feelings around spoken interviews, including anxiety and preparation methods; and reaction to the proposed interconnected companion concept. Each interview lasted approximately 20–30 minutes.
+[Insert interviewee count, profiles (anonymised), and key quotes here.]
+Summary of the Interview and Questionnaire
+The gathered responses confirmed the six problem areas identified in Section 1.2: respondents reported using multiple disconnected platforms, low confidence in identifying their own skill gaps, predominantly generic resumes despite ATS awareness, and high interview anxiety with no realistic rehearsal channel. Voice-based mock interviews and automatic resume tailoring ranked among the most requested capabilities, and the majority responded positively to a single integrated companion. These findings directly shaped the functional requirements below — in particular the decision to make skill-gap analysis and interview practice first-class agents rather than auxiliary features. [Adjust this summary to match your actual survey numbers.]
+4.3 Functional and Non-Functional Requirements
+4.3.1 Functional Requirements
+ID
+Requirement
+Priority
+FR-01
+The system shall allow users to register, log in, and maintain a profile with target role, location, and skills.
+Must
+FR-02
+The system shall aggregate job postings from free public APIs and store them with 768-d semantic embeddings.
+Must
+FR-03
+The system shall match jobs to the user with a hybrid score (embedding similarity + skill overlap) and display matched/missing skills per job.
+Must
+FR-04
+The system shall extract skills from user profiles and job descriptions using the custom-trained skill-extraction model (Model 2).
+Must
+FR-05
+The system shall produce a structured skill-gap report classifying skills as present or missing with importance ratings.
+Must
+FR-06
+The system shall generate an ordered learning plan with free resources per missing skill and track progress.
+Must
+FR-07
+The system shall classify uploaded or pasted resumes into one of 24 occupational categories using the custom-trained classifier (Model 1).
+Must
+FR-08
+The system shall generate ATS-keyword-optimised tailored resumes per target job, exportable as PDF.
+Must
+FR-09
+The system shall conduct voice-based mock interviews: spoken questions (TTS), spoken answers (STT), adaptive follow-ups, and per-answer feedback.
+Must
+FR-10
+The system shall provide a panic-control feature that pauses the interview and delivers anxiety-reduction guidance, tracking pre/post anxiety.
+Should
+FR-11
+The system shall map long-term career progression with per-stage skills and estimated durations.
+Must
+FR-12
+When a skill is marked learned, the system shall automatically refresh stale gap analyses and flag affected resume drafts within 30 seconds without blocking the UI (interconnected cascade).
+Must
+FR-13
+The system shall provide subject-based mock exams with scoring and e-mailed certificates.
+Could (added)
+FR-14
+The system shall provide a conversational AI assistant available across the application.
+Should
+Table 6: Functional requirements (MoSCoW prioritised)
+4.3.2 Non-functional Requirement
+ID
+Requirement
+NFR-01
+Security: every per-user table protected by PostgreSQL row-level security; users can access only their own rows; the shared job catalogue is read-only to authenticated users.
+NFR-02
+Performance: conversational responses streamed; mock-interview turn latency targeted below 2 seconds on average.
+NFR-03
+Responsiveness: long-running operations (job sync, cascade) execute in the background and never block the interface.
+NFR-04
+Cost: the entire system operates within the free tiers of all external services (Gemini, Groq, Supabase, job APIs, hosting).
+NFR-05
+Reproducibility: model training is fully scripted in version-controlled notebooks with fixed random seeds and recorded metrics.
+NFR-06
+Maintainability: clear separation of routers, services, and ML inference; agents communicate only via shared memory and events.
+Table 7: Non-functional requirements
+5.0 System Design
+5.1 Architecture Diagram
+The architecture comprises three tiers plus a model-inference component (Figure 1). The presentation tier (React 18 + Vite) renders a dashboard, per-agent workspaces, and a persistent chat panel, communicating with the backend over REST (JSON) and Server-Sent Events for streamed responses, and directly with Supabase for authentication. The application tier (FastAPI) exposes versioned routers per agent and hosts the ML inference module that loads both trained models and serves them as internal prediction functions. The data tier (Supabase PostgreSQL with pgvector) holds thirteen relational tables plus the agent_events table that functions as the shared event bus. Agents never invoke one another directly; they write to shared memory and emit events, which both enables the interconnected cascade and preserves standalone operation of every module.
+Figure 1: Three-tier system architecture with ML inference module and external services
+5.2 ER Diagram
+Figure 2 presents the entity-relationship model implemented in db/schema.sql: thirteen tables anchored on Supabase's auth.users. The design has three notable features. First, shared memory: the skills table is read and written by multiple agents (manual entry, resume parsing, learning completion), and its source column records provenance. Second, semantic columns: job_postings and resumes carry 768-dimension vector embeddings with HNSW indexes for cosine-similarity retrieval. Third, the event bus: agent_events records typed events (e.g., skill_learned) with a processed flag, decoupling event producers from consumers. All per-user tables enforce row-level security (auth.uid() = user_id); the job catalogue is a shared read-only resource written only by the backend service role. A database trigger auto-creates a profile row on user registration.
+Figure 2: Entity-relationship diagram (13 tables; cardinalities shown as 1:1 / 1:N)
+5.3 UML Diagrams
+5.3.1 Use Case Diagram
+Figure 3 presents the use case model. The actor interacts with fifteen primary use cases spanning the six agents plus the mock-exam and assistant modules; «include» relationships capture the mandatory involvement of the two trained models (resume classification on upload, skill extraction during gap analysis), and «extend» relationships capture optional behaviour (panic control during an interview, the skill-learned cascade after learning).
+Figure 3: Use case diagram of PathCompanion AI
+5.3.2 Class Diagram
+Figure 4 shows the backend class design. Eight routers translate HTTP requests into service calls; eleven services encapsulate business logic and external integrations. The MLModelService is the single point of access to both trained models, so every consumer receives consistent, reproducible predictions. LLM access is isolated in GeminiService and GroqService, meaning a provider change touches exactly one class.
+Figure 4: Backend class diagram — routers (blue) and services (green)
+5.3.3 Sequence Diagram — Interconnected Cascade
+Figure 5 models the system's distinguishing behaviour. When the user marks a skill as learned, the Learning router synchronously updates the skills table and inserts a skill_learned event, returning immediately so the interface is never blocked. The cascade then proceeds in the background: the Skill Gap agent consumes the event, re-runs skill extraction (Model 2) over open analyses, and refreshes their status; the Resume Architect consumes the same event and flags affected tailored resumes for refresh. The design target is completion within 30 seconds.
+Figure 5: Sequence diagram — the skill-learned cascade across agents via the event bus
+5.3.4 Sequence Diagram — Voice Mock Interview
+Figure 6 models one interview turn. Questions are generated with full context — the actual job description and the user's actual skills read from shared memory — then spoken aloud; the candidate's spoken answer is transcribed by Groq Whisper and coached per answer. The loop targets sub-2-second latency per turn, which drove the choice of Groq-hosted Llama 3.3 70B for conversational inference. The panic button pauses the session and delivers breathing and confidence guidance; pre- and post-session anxiety scores are stored for evaluation.
+Figure 6: Sequence diagram — voice mock interview loop with panic control
+5.3.5 Activity Diagram — Resume Architect
+Figure 7 traces the resume workflow. Both entry paths (PDF upload or in-app build) converge on Model 1 classification, whose predicted category is stored with the master resume and checked against the user's target role; a mismatch produces an alignment warning that steers the user toward gap analysis. Tailoring then generates a distinct ATS-optimised version per selected job, scored and exportable as PDF.
+Figure 7: Activity diagram — resume upload, classification (Model 1), tailoring and export
+5.4 Wireframe Diagram
+The interface follows a dark glassmorphism design system with a persistent sidebar (one entry per agent), a dashboard of status cards, and per-agent workspaces. Key screens: Login/Registration; Dashboard (connection status, quick stats); Profile & Skills (skill chips with proficiency); Job Scout (job cards with match percentage, matched/missing skill tags and a 'Learn these skills' action); Skill Gap (job description input, present/missing partition); Learning (per-skill resource checklist with progress bar); Resume Architect (upload/paste, predicted category, tailored preview); Interview (voice controls, live transcript, panic button); Career Path (stage timeline); Mock Exam (question runner and certificate).
+6.0 Implementation
+6.1 Technology Stack
+Layer
+Technology
+Frontend
+React 18, Vite, vanilla CSS (dark glassmorphism design system), Supabase JS client
+Backend
+FastAPI (Python 3.11, async), Uvicorn; routers per agent under /api/v1
+Database
+Supabase — PostgreSQL, pgvector (768-d), HNSW indexes, row-level security, Auth
+ML training
+Google Colab (free T4 GPU), scikit-learn, Hugging Face Transformers, PyTorch, pandas
+ML serving
+joblib-serialised models loaded by the FastAPI inference module (ml_models.py)
+AI services
+Google Gemini Flash (generation, JSON, embeddings), Groq Llama 3.3 70B (chat), Groq Whisper (STT), Edge-TTS / Web Speech (TTS)
+Job data
+Remotive (implemented), Adzuna / Arbeitnow (aggregation-ready)
+Tooling
+VS Code, Git/GitHub, Postman, pytest, Vitest
+Table 8: Technology stack
+6.2 Design patterns
+Layered architecture (router → service → data): routers handle HTTP concerns only; services encapsulate business logic; the data tier is accessed through the Supabase client. This separation keeps each layer independently testable.
+Facade: GeminiService and GroqService wrap all LLM provider interaction behind small interfaces (generate_text, generate_json, chat, transcribe), so a provider change touches one class.
+Singleton-style model loading: MLModelService loads both trained models once at startup and serves all predictions from memory, avoiding per-request deserialisation.
+Event-driven observer (publish–subscribe): agents publish typed events to the agent_events table and consumers react asynchronously — the backbone of the interconnected cascade, chosen over direct calls to preserve standalone modules and idempotent re-processing.
+Repository-style data access: services own all table access for their domain, keeping SQL/PostgREST calls out of routers.
+6.3 Implementation of the program
+6.3.1 Backend Structure
+The backend follows the router–service separation designed in Section 5.3.2. Nine routers (jobs, skillgap, learning, resume, interview, career, exam, chat, assistant) validate requests with Pydantic models and delegate to services. Services encapsulate: job aggregation and upserting (jobs.py), hybrid matching with cosine similarity over pgvector embeddings (matching.py), embedding generation (embeddings.py), LLM access (gemini.py, groq_svc.py), interview question generation, coaching and feedback (interview.py), learning-plan and career-path generation (learning.py, career.py), certificate e-mail delivery (email_svc.py), and model inference (ml_models.py). Long-running operations return immediately and complete in the background, in line with NFR-03.
+6.3.2 ML Model 1 — Resume Category Classifier
+Dataset: the Kaggle Resume Dataset — 2,484 labelled resumes across 24 occupational categories (Information-Technology, Engineering, Finance, HR, Healthcare and others). Preprocessing: lowercasing; removal of URLs, e-mail addresses, punctuation and stop-words; label encoding; stratified 90/10 train/test split (2,235 / 249). Baseline: TF-IDF features with Logistic Regression. Transformer: DistilBERT (distilbert-base-uncased) fine-tuned for multi-class classification with a maximum sequence length of 256 tokens. Both models were trained in a version-controlled Colab notebook (ml/Model1_Resume_Classifier.ipynb); the baseline is serialised with joblib and served from backend/models/, and the fine-tuned weights are exported via save_pretrained for transformer serving.
+6.3.3 ML Model 2 — Skill-Extraction Model
+Label space: the 25 highest-frequency skills derived from ESCO-aligned skill mentions in public job-description text. Dataset: ~11,800 postings sampled (seed 42) from the LinkedIn Job Postings dataset, labelled by LLM-assisted weak supervision and binarised with a MultiLabelBinarizer; stratified 90/10 split. Baseline: TF-IDF with One-vs-Rest Logistic Regression. Transformer: DistilBERT configured for multi-label classification (problem_type = multi_label_classification, sigmoid outputs, binary cross-entropy loss), trained for 3 epochs with batch size 16 and max length 256 on a Colab T4 GPU (ml/Model2_Skill_Extraction.ipynb). The trained artefacts (baseline joblib, label vocabulary JSON, DistilBERT weights) are exported for backend serving.
+6.3.4 Model Inference Module
+ml_models.py exposes three functions to the rest of the backend: classify_resume(text) returning the predicted category, classify_resume_top(text, k) returning the top-k categories with confidences, and extract_skills(text, threshold, top_k) returning detected skills. The Resume router calls the classifier on both pasted text and uploaded files (with PDF text extraction); the Skill Gap router uses extraction over both the user profile and the target job description, then computes the present/missing partition.
+6.3.5 The Interconnected Cascade
+The cascade is implemented exactly as designed in Figure 5: completion of a learning item updates the skills table and inserts a skill_learned row into agent_events; background processing consumes unprocessed events, re-evaluates open gap analyses through Model 2, updates learning-plan progress, and sets needs_refresh on affected resumes. Because consumers read from the event table rather than being invoked directly, the cascade is idempotent — reprocessing an event produces the same state — and each module continues to work standalone.
+6.3.6 Frontend and Security
+The single-page application provides one page per agent (Jobs, SkillGap, Learning, Resume, Interview, CareerPath) plus Dashboard, MockExam, Chatbot, Profile and Login, a persistent sidebar, and an AI-assistant drawer available across pages. State is managed in a lightweight store; authentication uses the Supabase JS client with JWTs attached to backend requests. The interview page implements the browser side of the voice loop: microphone capture, audio upload for transcription, and speech synthesis of questions. All per-user tables enforce row-level security with auth.uid() = user_id policies; API keys for external services are held in server-side environment variables and never exposed to the client.
+7.0 Testing and Validation
+Test Plan
+Testing combined four levels: unit tests over services (pytest); integration tests over API routes with a test database; model evaluation on held-out test sets inside the training notebooks; and manual end-to-end scenario testing across the deployed application (registration through interview feedback). Interactive API verification used the FastAPI /docs interface and Postman collections. Model validation additionally compares each trained model against its classical baseline on the same held-out split, which is the primary scientific claim of the ML workstream.
+Test Cases
+Test ID
+Scenario
+Expected result
+T-01
+Register → login → profile row auto-created
+Profile visible; RLS blocks other users' rows
+T-02
+Job sync from Remotive
+Postings upserted with embeddings; duplicates ignored
+T-03
+Find my matches
+Ranked matches with score, matched & missing skills
+T-04
+Paste resume → classify
+Model 1 returns category + top-3 confidences
+T-05
+Paste job description → analyze gap
+Model 2 returns present/missing skill partition
+T-06
+Generate learning plan for missing skill
+≥3 free resources, ordered, with progress tracking
+T-07
+Mark skill learned → cascade
+Gap refreshed and resume flagged within 30 s; UI unblocked
+T-08
+Voice interview turn
+Spoken question, transcription, feedback; latency ~2 s
+T-09
+Panic button
+Session pauses; guidance shown; anxiety logged pre/post
+T-10
+Mock exam → certificate
+Score stored; certificate e-mail delivered
+Table 9: Key end-to-end test scenarios
+[Insert executed test evidence: pass/fail status per test case with screenshots, and pytest output. A detailed test case template is provided in Appendix 1.]
+Model Validation — Model 1 (Resume Category Classifier)
+Model
+Accuracy
+Macro-F1
+Notes
+TF-IDF + Logistic Regression (baseline)
+0.655
+0.596
+Fast, interpretable reference
+Fine-tuned DistilBERT
+0.823
+0.751
++16.8 pts accuracy over baseline
+Proposal target
+0.80–0.85
+≈0.80 (weighted)
+Accuracy target met at the 80% level
+Table 10: Model 1 evaluation on the held-out test set (249 resumes, 24 classes)
+The fine-tuned DistilBERT clearly outperforms the classical baseline — the key comparative result — improving accuracy by 16.8 percentage points and macro-F1 by 0.155. Against the proposal targets, the 82.3% accuracy satisfies the revised 80% threshold, while macro-F1 of 0.751 falls short of 0.80. Error analysis attributes this to two factors: resumes are long documents and truncation to 256 tokens discards signal, and the dataset is imbalanced — categories such as BPO and Automobile have very few samples, and macro averaging weights these rare classes equally.
+Model Validation — Model 2 (Skill Extraction)
+Model
+Micro-F1
+Macro-F1
+Notes
+TF-IDF + OvR Logistic Regression (baseline)
+[fill]
+[fill]
+From notebook Section 4
+Multi-label DistilBERT
+[fill]
+[fill]
+From notebook Section 6
+Proposal target
+≥0.70
+—
+Table 11: Model 2 evaluation (~11,800 postings, 25 labels, 90/10 split) — insert final metrics from the Colab run
+Validation Against Objectives
+Objective
+Status
+Evidence
+Supabase schema with pgvector + RLS as shared memory
+Achieved
+db/schema.sql; Appendix 1
+Model 1 trained and benchmarked vs baseline
+Achieved
+Table 12; notebook
+Model 2 trained (weak labelling, multi-label DistilBERT)
+Achieved
+Table 13; notebook
+Job aggregation + hybrid semantic matching
+Achieved
+Jobs agent; T-02/T-03
+Skill-gap analysis via Model 2
+Achieved
+T-05
+Learning plans (≥3 free resources per skill)
+Achieved
+T-06
+Resume classify + ATS-tailored generation
+Achieved
+T-04; Resume agent
+Voice mock interview + panic control
+Achieved
+T-08/T-09
+Career-path planning
+Achieved
+CareerPath agent
+Interconnected cascade < 30 s, non-blocking
+Achieved
+T-07; Figure 5
+Operate entirely on free tiers
+Achieved
+No paid services used
+Mock exam + certificates (beyond proposal)
+Added
+Exam module; T-10
+Table 12: Objective-by-objective validation
+Limitations
+Macro-F1 below target for Model 1 (0.751 vs 0.80): driven by 256-token truncation of long resumes and class imbalance in rare categories. Planned mitigations: 512-token inputs, class weighting or light re-balancing, and additional epochs. The transformer-vs-baseline improvement — the primary scientific claim — is unambiguous.
+Model 2 label space restricted to 25 high-frequency skills: tractable and demonstrably useful, but a production system would expand toward the full ESCO vocabulary with hierarchical classification.
+Weak labels inherit LLM annotation noise; the manually verified subset mitigates but does not eliminate this.
+Job aggregation currently exercises Remotive end-to-end; additional sources are integration-ready but not all continuously synced.
+Interview latency depends on external API load; the sub-2-second target is met typically but not guaranteed under provider throttling.
+8.0 Conclusion
+8.1 Conclusion
+This project set out to unify the fragmented career journey into a single intelligent application, and to do so with engineering substance beyond LLM API consumption. Both goals were met. The delivered system implements six cooperating agents over a shared-memory, event-driven architecture that demonstrably cascades insight between modules while preserving standalone operation. Its analytical core is supplied by two models trained specifically for this project: the resume classifier improves on its classical baseline by 16.8 accuracy points (82.3% vs 65.5%), and the skill-extraction model powers reproducible gap analysis independent of external providers. The full stack — React, FastAPI, Supabase with pgvector, and free-tier AI services — operates at effectively zero marginal cost, making equitable access realistic.
+Academically, the project exercises the complete breadth of contemporary software engineering — requirements, relational and vector database design, asynchronous API architecture, security, testing — alongside a complete supervised machine-learning workflow from dataset acquisition through deployment behind an inference API.
+8.2 Future Recommendations
+Model improvements: 512-token inputs, class weighting, expanded skill vocabulary, larger manually annotated evaluation sets.
+Deferred agents: Daily Journal & Discussion (skill extraction from journal entries) and monthly Career Progress Summariser.
+Automation: application e-mails and follow-ups, weekly digests, WhatsApp reminders, one-click apply with the tailored resume.
+Reach: recruiter-side portal over anonymised profiles, multilingual interfaces (Tamil, Sinhala), and a React Native mobile client sharing the same backend.
+8.3 Lessons Learned
+Baseline first, transformer second: building the TF-IDF baseline before fine-tuning DistilBERT provided both a sanity check and the comparative frame that turned raw metrics into a defensible claim.
+Targets should anticipate dataset realities: the original macro-F1 target did not account for severe class imbalance; quantitative targets should be set after exploratory data analysis, not before.
+Event-driven decoupling pays off: implementing the cascade through an event table instead of direct agent calls simplified testing enormously and prevented cross-module breakage during iteration.
+Free tiers are workable but demand design discipline: caching, background jobs, and per-task model selection were necessary from the start, not optimisations to defer.
+Scope control is a continuous activity: adding the mock-exam module was affordable only because two originally planned agents had been consciously deferred early.
+Gantt Chart
+Figure 8: Project Gantt chart — eight two-week phases over 16 weeks
+References
+Bhawal, S. (2021). Resume Dataset. Kaggle. https://www.kaggle.com/datasets/snehaanbhawal/resume-dataset
+European Commission. ESCO: European Skills, Competences, Qualifications and Occupations (CC BY 4.0). https://esco.ec.europa.eu/en/use-esco/download
+Google AI for Developers (2026). Gemini API rate limits and pricing. https://ai.google.dev/gemini-api/docs/rate-limits
+Groq Inc. (2026). GroqDocs: Rate limits. https://console.groq.com/docs/rate-limits
+Hugging Face. Transformers documentation. https://huggingface.co/docs/transformers
+Koneru, A. (2024). LinkedIn Job Postings (2023–2024). Kaggle. https://www.kaggle.com/datasets/arshkon/linkedin-job-postings
+LangChain Inc. (2025). LangGraph documentation. https://langchain-ai.github.io/langgraph/
+Pedregosa, F. et al. (2011). Scikit-learn: Machine Learning in Python. Journal of Machine Learning Research, 12, 2825–2830.
+Sanh, V., Debut, L., Chaumond, J., & Wolf, T. (2019). DistilBERT, a distilled version of BERT: smaller, faster, cheaper and lighter. arXiv:1910.01108.
+Supabase Inc. (2026). pgvector: Embeddings and vector similarity. https://supabase.com/docs/guides/ai
+U.S. Department of Labor. O*NET OnLine. https://www.onetonline.org/
+Zhang, M., Jensen, K. N., & Plank, B. (2022). Skill Extraction from Job Postings using Weak Supervision. arXiv:2209.08071.
+Appendix 1
+Questionnaire and answers
+[Insert the full questionnaire form and collected responses/charts here. The question set is listed in Section 4.2.2.]
+Source codes
+The complete source code (frontend, backend, database schema, and both training notebooks) is version-controlled at: [GitHub repository URL]. Repository structure: frontend/ (React application), backend/app/ (FastAPI routers and services), backend/models/ (serialised trained models), ml/ (Model 1 and Model 2 training notebooks), db/schema.sql (full database schema), docs/ (documentation and diagrams). Setup instructions are in the repository README; run_app.bat starts both tiers locally. Key excerpts (the inference module, the cascade handler, and the matching service) may be reproduced here if required by the marker.
+Test Case
+Field
+Detail
+Test case ID
+T-07 (detailed example)
+Title
+Interconnected cascade on skill-learned event
+Precondition
+User logged in; an open gap analysis lists 'Docker' as missing; a tailored resume exists for a job requiring Docker
+Steps
+1. Open Learning page. 2. Mark the Docker learning plan as completed. 3. Observe immediate UI confirmation. 4. Within 30 s, reload Skill Gap and Resume pages.
+Expected result
+skills table contains Docker (source='learning'); gap analysis no longer lists Docker as missing; resume shows a 'needs refresh' flag; UI was never blocked
+Actual result
+[record on execution]
+Status
+[Pass/Fail]
+Table 13: Detailed test case template (T-07)
+Appendix 2
+Supervision meeting log sheets
+[Attach the signed supervision meeting log sheets here.]

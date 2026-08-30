@@ -1,0 +1,29 @@
+%% Sequence Diagram 1 — Interconnected "skill-learned" Cascade (the USP)
+%% Chapter 4/5: shows agents cooperating via shared memory, never calling each other directly
+sequenceDiagram
+    autonumber
+    actor U as User
+    participant FE as React Frontend
+    participant LR as Learning Router<br/>(FastAPI)
+    participant DB as Supabase<br/>(shared memory)
+    participant EV as agent_events<br/>(event bus)
+    participant M2 as Model 2<br/>Skill Extractor
+    participant GA as Skill Gap Agent
+    participant RA as Resume Architect
+
+    U->>FE: Mark skill "Docker" as learned
+    FE->>LR: POST /learning/complete
+    LR->>DB: UPDATE skills (proficiency, source='learning')
+    LR->>EV: INSERT event {type: skill_learned, payload: Docker}
+    LR-->>FE: 200 OK (UI not blocked)
+    FE-->>U: ✅ Skill saved instantly
+
+    Note over EV,RA: Background cascade (< 30 s)
+    EV->>GA: skill_learned event consumed
+    GA->>M2: re-extract skills for open analyses
+    M2-->>GA: present / missing skills
+    GA->>DB: UPDATE gap_analyses (Docker → present, status refreshed)
+    GA->>DB: UPDATE learning_plans (progress recalculated)
+    EV->>RA: same event consumed
+    RA->>DB: UPDATE resumes SET needs_refresh = true
+    Note over U,DB: Next visit: fresh gap report + "resume refresh" flag

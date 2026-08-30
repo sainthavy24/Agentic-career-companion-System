@@ -19,6 +19,7 @@ PAGE_MAP = {
     "/jobs": ("Job Scout", "This page lists job postings retrieved from aggregators, matching them against the user's profile and showing custom match scores."),
     "/skill-gap": ("Skill Gap Analyzer", "This page compares the user's existing profile skills with a target job description or role, highlighting which categories and skills they are missing."),
     "/resume": ("Resume Architect", "Here users upload their resume PDFs, get them classified by NLP classifier models, view their ATS scoring feedback, and tailor them for jobs."),
+    "/resume-builder": ("Resume Builder", "Here users generate AI-tailored resumes from their profile details and skills, targeted at a pasted job description or a Job Scout posting, choose from 3 templates and download as PDF."),
     "/learning": ("Learning Path", "This agent builds study plans for missing skills, listing tutorials, docs, projects, and courses. Users check off steps as they complete them."),
     "/career": ("Career Path Plan", "Here users map a strategic step-by-step career path ladder from their current skills to their target goal role, including milestones."),
     "/interview": ("Mock Interview", "This page lets users practice mock technical or behavioral voice interviews, records transcripts, and provides detailed feedback and scoring.")
